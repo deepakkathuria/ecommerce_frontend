@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Footer, Navbar } from "../components";
+import { useDispatch } from "react-redux";
+import { syncCart } from "../redux/action";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -8,12 +10,14 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate(); // Replaced useHistory with useNavigate
+  const dispatch = useDispatch(); // Initialize dispatch
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     try {
       const response = await fetch("http://localhost:8000/auth/signin", {
         method: "POST",
@@ -22,17 +26,27 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
-
-      // Store token in local storage
+  
+      // Store token
       localStorage.setItem("apitoken", data.token);
-
-      // Redirect to Home page
+  
+      // Fetch and sync cart
+      const cartResponse = await fetch("http://localhost:8000/cart", {
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      });
+  
+      const cartData = await cartResponse.json();
+      dispatch(syncCart(cartData.cartItems)); // Sync Redux with backend cart
+  
+      // Redirect to Home
       navigate("/");
     } catch (err) {
       setError(err.message);

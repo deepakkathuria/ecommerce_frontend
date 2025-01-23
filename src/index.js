@@ -16,6 +16,7 @@ import {
   Login,
   Register,
   Checkout,
+  Profile,
   PageNotFound,
 } from "./pages";
 import ScrollToTop from "./components/ScrollToTop";
@@ -37,6 +38,8 @@ root.render(
           <Route path="/register" element={<Register />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="*" element={<PageNotFound />} />
+          <Route path="/profile/*" element={<Profile />} />
+
           <Route path="/product/*" element={<PageNotFound />} />
         </Routes>
       </Provider>

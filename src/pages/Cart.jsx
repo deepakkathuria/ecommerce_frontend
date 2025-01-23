@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Footer, Navbar } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { addCart, delCart } from "../redux/action";
 import { Link } from "react-router-dom";
+import { syncCart } from "../redux/action";
+
 
 const Cart = () => {
   const state = useSelector((state) => state.handleCart);
   const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      const token = localStorage.getItem("apitoken");
+      if (!token) return;
+
+      try {
+        const response = await fetch("http://localhost:8000/cart", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        dispatch(syncCart(data.cartItems));
+      } catch (err) {
+        console.error("Failed to fetch cart:", err);
+      }
+    };
+
+    fetchCart();
+  }, [dispatch]);
 
   const EmptyCart = () => {
     return (
