@@ -43,11 +43,11 @@ const Product = () => {
         ],
       };
 
-      const response = await fetch("http://localhost:8000/cart/add", {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Attach Token Here
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(cartItem),
       });
@@ -76,18 +76,25 @@ const Product = () => {
       setLoading2(true);
       try {
         // Fetch single product by ID
-        const response = await fetch(`http://localhost:8000/product/${id}`);
+        const response = await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/product/${id}`);
         const result = await response.json();
 
         if (result.status === 200 && result.rows.length > 0) {
           const productData = result.rows[0];
+
+          // ✅ Image Mapping Logic
+          const productImage =
+            productData.first_image ||
+            (productData.images && productData.images.length > 0 && productData.images[0]) ||
+            "https://via.placeholder.com/150"; // Default image
+
           const formattedProduct = {
             id: productData.item_id,
             title: productData.name || "No Title",
             price: productData.price || 0,
             description: productData.description || "No description available",
             category: productData.category || "Uncategorized",
-            image: productData.images || "https://via.placeholder.com/150",
+            image: productImage,
             rating: {
               rate: parseFloat(productData.avg_rating) || 0,
               count: productData.ratings_length || 0,
@@ -98,7 +105,7 @@ const Product = () => {
 
           // Fetch similar products by category
           const categoryResponse = await fetch(
-            `http://localhost:8000/category/${productData.category}`
+            `https://hammerhead-app-jkdit.ondigitalocean.app/category/${productData.category}`
           );
           const categoryResult = await categoryResponse.json();
 
@@ -109,7 +116,10 @@ const Product = () => {
               price: item.price || 0,
               description: item.description || "No description available",
               category: item.category || "Uncategorized",
-              image: item.images || "https://via.placeholder.com/150",
+              image:
+                item.first_image ||
+                (item.images && item.images.length > 0 && item.images[0]) ||
+                "https://via.placeholder.com/150", // Default image
               rating: {
                 rate: parseFloat(item.avg_rating) || 0,
                 count: item.ratings_length || 0,
@@ -166,7 +176,7 @@ const Product = () => {
           <p className="lead">
             {product.rating?.rate} <i className="fa fa-star"></i>
           </p>
-          <h3 className="display-6 my-4">${product.price}</h3>
+          <h3 className="display-6 my-4">Rs.{product.price}</h3>
           <p className="lead">{product.description}</p>
           <button
             className="btn btn-outline-dark"

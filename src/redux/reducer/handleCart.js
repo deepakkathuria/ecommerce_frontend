@@ -23,14 +23,18 @@ const handleCart = (state = getInitialCart(), action) => {
 
     case "DELITEM":
       const exist2 = state.find((x) => x.id === product.id);
-      if (exist2.qty === 1) {
-        updatedCart = state.filter((x) => x.id !== exist2.id);
+      if (exist2) {
+        if (exist2.qty === 1) {
+          updatedCart = state.filter((x) => x.id !== exist2.id);
+        } else {
+          updatedCart = state.map((x) =>
+            x.id === product.id ? { ...x, qty: x.qty - 1 } : x
+          );
+        }
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
       } else {
-        updatedCart = state.map((x) =>
-          x.id === product.id ? { ...x, qty: x.qty - 1 } : x
-        );
+        updatedCart = [...state]; // Keep the state unchanged if item doesn't exist
       }
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
       return updatedCart;
 
     case "CLEAR_CART":
@@ -39,8 +43,13 @@ const handleCart = (state = getInitialCart(), action) => {
       return updatedCart;
 
     case "SYNC_CART":
-      localStorage.setItem("cart", JSON.stringify(action.payload)); // Sync with localStorage
-      return action.payload;
+      // Ensure that `qty` is correctly set from `quantity`
+      updatedCart = action.payload.map((item) => ({
+        ...item,
+        qty: item.qty || item.quantity || 1, // Ensure qty is assigned properly
+      }));
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Sync with localStorage
+      return updatedCart;
 
     default:
       return state;

@@ -18,7 +18,7 @@ const Register = () => {
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:8000/auth/signup", {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

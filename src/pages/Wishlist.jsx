@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Navbar } from "../components";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -6,7 +7,7 @@ const Wishlist = () => {
   useEffect(() => {
     const fetchWishlist = async () => {
       const token = localStorage.getItem("apitoken");
-      const response = await fetch("http://localhost:8000/wishlist", {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -20,6 +21,7 @@ const Wishlist = () => {
 
   return (
     <div>
+
       <h4>Wishlist</h4>
       {wishlist.length === 0 ? (
         <p>Your wishlist is empty.</p>

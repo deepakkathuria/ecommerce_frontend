@@ -10,7 +10,7 @@ export const addCart = (product) => async (dispatch, getState) => {
       );
   
       // Sync with backend
-      await fetch("http://localhost:8000/cart/add", {
+      await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export const addCart = (product) => async (dispatch, getState) => {
       const token = localStorage.getItem("apitoken");
   
       // Update backend
-      await fetch(`http://localhost:8000/cart/remove/${product.id}`, {
+      await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/cart/remove/${product.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -58,7 +58,7 @@ export const addCart = (product) => async (dispatch, getState) => {
       const token = localStorage.getItem("apitoken");
   
       // Clear cart in backend
-      await fetch("http://localhost:8000/cart/clear", {
+      await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

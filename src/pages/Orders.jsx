@@ -6,7 +6,7 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem("apitoken");
-      const response = await fetch("http://localhost:8000/orders", {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/orders", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -43,7 +43,7 @@ const Products = () => {
         ],
       };
 
-      const response = await fetch("http://localhost:8000/cart/add", {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,10 +56,7 @@ const Products = () => {
         throw new Error("Failed to add product to cart");
       }
 
-      const result = await response.json();
       toast.success("Product added to cart successfully!");
-
-      // Optionally dispatch to Redux for state management
       dispatch(addCart(product));
     } catch (error) {
       console.error("Error adding product to cart:", error);
@@ -74,18 +71,21 @@ const Products = () => {
     const getProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:8000/products");
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/products");
         const result = await response.json();
 
         if (componentMounted) {
-          // Map API response to desired format
+          // Map API response to format
           const formattedData = result.rows.map((item) => ({
             id: item.item_id,
             title: item.name || "No Title",
             price: item.price || 0,
             description: item.description || "No description available",
             category: item.category || "Uncategorized",
-            image: item.images || "https://via.placeholder.com/150",
+            images:
+              item.images && item.images.length > 0
+                ? item.images
+                : ["https://via.placeholder.com/150"], // Default placeholder
             rating: {
               rate: parseFloat(item.avg_rating) || 0,
               count: item.rating_count || 0,
@@ -166,64 +166,91 @@ const Products = () => {
         ))}
       </div>
 
-      {filter.map((product) => (
-        <div
-          id={product.id}
-          key={product.id}
-          className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4"
-        >
-          <div className="card text-center h-100" key={product.id}>
-            <img
-              className="card-img-top p-3"
-              src={product.image}
-              alt={product.title}
-              height={300}
-            />
-            <div className="card-body">
-              <h5 className="card-title">
-                {product.title.substring(0, 12)}...
-              </h5>
-              <p className="card-text">
-                {product.description.substring(0, 90)}...
-              </p>
-            </div>
-            <ul className="list-group list-group-flush">
-              <li className="list-group-item lead">$ {product.price}</li>
-            </ul>
-            <div className="card-body">
-              <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
-                Buy Now
-              </Link>
-              <button
-                className="btn btn-dark m-1"
-                onClick={() => addProductToCart(product)}
-              >
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
+      <div className="row">
+        {filter.map((product) => (
+          <ProductCard key={product.id} product={product} addProductToCart={addProductToCart} />
+        ))}
+      </div>
     </>
   );
 
-  /**
-   * Render Component
-   */
   return (
-    <>
-      <div className="container my-3 py-3">
-        <div className="row">
-          <div className="col-12">
-            <h2 className="display-5 text-center">Latest Products</h2>
-            <hr />
-          </div>
-        </div>
-        <div className="row justify-content-center">
-          {loading ? <Loading /> : <ShowProducts />}
+    <div className="container my-3 py-3">
+      <div className="row">
+        <div className="col-12">
+          <h2 className="display-5 text-center">Latest Products</h2>
+          <hr />
         </div>
       </div>
-    </>
+      <div className="row justify-content-center">
+        {loading ? <Loading /> : <ShowProducts />}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Product Card with Image Scrolling
+ */
+const ProductCard = ({ product, addProductToCart }) => {
+  const [currentImage, setCurrentImage] = useState(0);
+
+  const handleNextImage = () => {
+    setCurrentImage((prev) => (prev + 1) % product.images.length);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImage((prev) =>
+      prev === 0 ? product.images.length - 1 : prev - 1
+    );
+  };
+
+  return (
+    <div className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4">
+      <div className="card text-center h-100">
+        <div className="position-relative">
+          <img
+            className="card-img-top p-3"
+            src={product.images[currentImage]}
+            alt={product.title}
+            height={300}
+            style={{ objectFit: "contain" }}
+          />
+          {product.images.length > 1 && (
+            <>
+              <button
+                className="btn btn-sm btn-light position-absolute start-0 top-50"
+                onClick={handlePrevImage}
+                style={{ transform: "translateY(-50%)" }}
+              >
+                ◀
+              </button>
+              <button
+                className="btn btn-sm btn-light position-absolute end-0 top-50"
+                onClick={handleNextImage}
+                style={{ transform: "translateY(-50%)" }}
+              >
+                ▶
+              </button>
+            </>
+          )}
+        </div>
+        <div className="card-body">
+          <h5 className="card-title">{product.title}</h5>
+          <p className="card-text">{product.description.substring(0, 90)}...</p>
+          <h6 className="lead">Rs.{product.price}</h6>
+          <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
+            Buy Now
+          </Link>
+          <button
+            className="btn btn-dark m-1"
+            onClick={() => addProductToCart(product)}
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

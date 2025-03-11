@@ -19,7 +19,7 @@ const Login = () => {
     setError("");
   
     try {
-      const response = await fetch("http://localhost:8000/auth/signin", {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +37,7 @@ const Login = () => {
       localStorage.setItem("apitoken", data.token);
   
       // Fetch and sync cart
-      const cartResponse = await fetch("http://localhost:8000/cart", {
+      const cartResponse = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
         headers: {
           Authorization: `Bearer ${data.token}`,
         },

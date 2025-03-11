@@ -12,7 +12,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("apitoken");
-      await fetch("http://localhost:8000/cart/clear", {
+      await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear", {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -31,7 +31,17 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
       <div className="container">
         <NavLink className="navbar-brand fw-bold fs-4 px-2" to="/">
-          Dk Ecommerce
+          <img
+            src="/assets/logo1.png"
+            alt="DK Ecommerce Logo"
+            width="200"
+            height="150"
+            style={{
+              background: "transparent",
+              border: "none",
+              boxShadow: "none",
+            }}
+          />
         </NavLink>
         <button
           className="navbar-toggler mx-2"
