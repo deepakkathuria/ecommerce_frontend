@@ -15,6 +15,9 @@ const Product = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
+  let touchStartX = 0;
+  let touchEndX = 0;
+
   /**
    * Add Product to Cart with Token Authentication
    */
@@ -40,14 +43,17 @@ const Product = () => {
         ],
       };
 
-      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(cartItem),
-      });
+      const response = await fetch(
+        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(cartItem),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to add product to cart");
@@ -68,21 +74,24 @@ const Product = () => {
     const getProduct = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/product/${id}`);
+        const response = await fetch(
+          `https://hammerhead-app-jkdit.ondigitalocean.app/product/${id}`
+        );
         const result = await response.json();
 
         if (result.status === 200 && result.rows.length > 0) {
           const productData = result.rows[0];
 
           // Extract images or use placeholder
-          const productImages = productData.images?.length > 0 ? productData.images : [
-            "https://via.placeholder.com/400",
-          ];
+          const productImages =
+            productData.images?.length > 0
+              ? productData.images
+              : ["https://via.placeholder.com/400"];
 
           setProduct({
             id: productData.item_id,
             title: productData.name || "No Title",
-            price: productData.price || 0,
+            price: Math.round(productData.price) || 0, // Round price
             description: productData.description || "No description available",
             category: productData.category || "Uncategorized",
             rating: {
@@ -112,7 +121,35 @@ const Product = () => {
   };
 
   /**
-   * Show Product with Multi-Image Gallery
+   * Handle Swipe Gesture on Mobile
+   */
+  const handleTouchStart = (e) => {
+    touchStartX = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    touchEndX = e.changedTouches[0].clientX;
+    handleSwipe();
+  };
+
+  const handleSwipe = () => {
+    const index = images.indexOf(selectedImage);
+
+    if (touchStartX - touchEndX > 50) {
+      // Swipe Left → Next Image
+      if (index < images.length - 1) {
+        setSelectedImage(images[index + 1]);
+      }
+    } else if (touchEndX - touchStartX > 50) {
+      // Swipe Right → Previous Image
+      if (index > 0) {
+        setSelectedImage(images[index - 1]);
+      }
+    }
+  };
+
+  /**
+   * Show Product with Multi-Image Gallery and Swipe Functionality
    */
   const ShowProduct = () => {
     return (
@@ -125,14 +162,21 @@ const Product = () => {
                 key={index}
                 src={img}
                 alt={`Thumbnail ${index + 1}`}
-                className={`img-thumbnail mb-2 ${selectedImage === img ? "border-primary" : ""}`}
-                style={{ cursor: "pointer", width: "60px", height: "60px", objectFit: "cover" }}
+                className={`img-thumbnail mb-2 ${
+                  selectedImage === img ? "border-primary" : ""
+                }`}
+                style={{
+                  cursor: "pointer",
+                  width: "60px",
+                  height: "60px",
+                  objectFit: "cover",
+                }}
                 onClick={() => handleImageClick(img)}
               />
             ))}
           </div>
 
-          {/* Main Image Display */}
+          {/* Main Image Display with Swipe Events */}
           <div className="col-md-6 col-sm-12 py-3">
             <img
               className="img-fluid"
@@ -141,6 +185,8 @@ const Product = () => {
               width="100%"
               height="auto"
               style={{ maxHeight: "500px", objectFit: "contain" }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             />
           </div>
 
@@ -155,8 +201,15 @@ const Product = () => {
                   key={index}
                   src={img}
                   alt={`Thumbnail ${index + 1}`}
-                  className={`img-thumbnail ${selectedImage === img ? "border-primary" : ""}`}
-                  style={{ cursor: "pointer", width: "60px", height: "60px", objectFit: "cover" }}
+                  className={`img-thumbnail ${
+                    selectedImage === img ? "border-primary" : ""
+                  }`}
+                  style={{
+                    cursor: "pointer",
+                    width: "60px",
+                    height: "60px",
+                    objectFit: "cover",
+                  }}
                   onClick={() => handleImageClick(img)}
                 />
               ))}
@@ -171,48 +224,27 @@ const Product = () => {
               {product.rating?.rate} <i className="fa fa-star"></i>
             </p>
 
-            {/* Pricing with Discount */}
+            {/* Pricing with Discount (Rounded Off) */}
             <h3 className="display-6 my-4">
-              <del style={{ color: "red", marginRight: "5px" }}>Rs.{product.price}</del>
+              <del style={{ color: "red", marginRight: "5px" }}>
+                Rs.{product.price}
+              </del>
               <span style={{ fontWeight: "bold", color: "#000" }}>
-                Rs.{(product.price * 0.9).toFixed(2)}
+                Rs.{Math.round(product.price * 0.9)}
               </span>
-              <span style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}>
+              <span
+                style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}
+              >
                 (10% OFF)
               </span>
             </h3>
 
-            <p className="lead">{product.description}</p>
-
-            {/* Buttons - Styled Like Your Previous Design */}
-            <div className="d-flex mt-4">
-              <button
-                className="btn btn-warning btn-lg flex-grow-1 d-flex align-items-center justify-content-center"
-                onClick={() => addProductToCart(product)}
-                style={{
-                  backgroundColor: "#FFA500",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  border: "none",
-                  borderRadius: "5px",
-                  padding: "10px 15px",
-                  marginRight: "10px",
-                }}
-              >
+            {/* Buttons */}
+            <div className="d-flex mt-3">
+              <button className="btn btn-dark btn-sm flex-grow-1 mr-2">
                 🛒 ADD TO CART
               </button>
-              <Link
-                to="/cart"
-                className="btn btn-danger btn-lg flex-grow-1 d-flex align-items-center justify-content-center"
-                style={{
-                  backgroundColor: "#FF4500",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  border: "none",
-                  borderRadius: "5px",
-                  padding: "10px 15px",
-                }}
-              >
+              <Link to="/cart" className="btn btn-dark btn-sm flex-grow-1">
                 ⚡ BUY NOW
               </Link>
             </div>
@@ -226,7 +258,9 @@ const Product = () => {
     <>
       <Navbar />
       <div className="container">
-        <div className="row">{loading ? <Skeleton height={400} /> : <ShowProduct />}</div>
+        <div className="row">
+          {loading ? <Skeleton height={400} /> : <ShowProduct />}
+        </div>
       </div>
       <Footer />
     </>
