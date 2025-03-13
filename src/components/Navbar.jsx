@@ -12,10 +12,13 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("apitoken");
-      await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear", {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await fetch(
+        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear",
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       localStorage.removeItem("apitoken");
       dispatch(clearCart());
@@ -34,25 +37,38 @@ const Navbar = () => {
           <img
             src="/assets/logo1.png"
             alt="DK Ecommerce Logo"
-            width="200"
-            height="150"
-            style={{
-              background: "transparent",
-              border: "none",
-              boxShadow: "none",
-            }}
+            className="d-block mx-auto d-md-none"
+            width="100"
+            height="50"
+          />
+          <img
+            src="/assets/logo1.png"
+            alt="DK Ecommerce Logo"
+            className="d-none d-md-block mx-auto"
+            width="150"
+            height="100"
           />
         </NavLink>
         <button
-          className="navbar-toggler mx-2"
+          className="navbar-toggler mx-2 p-1 p-md-2"
           type="button"
           data-toggle="collapse"
           data-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent"
           aria-expanded="false"
           aria-label="Toggle navigation"
+          style={{
+            width: "35px", // Adjust width of the button
+            height: "35px", // Adjust height of the button
+          }}
         >
-          <span className="navbar-toggler-icon"></span>
+          <span
+            className="navbar-toggler-icon"
+            style={{
+              width: "22px", // Adjust width of icon
+              height: "22px", // Adjust height of icon
+            }}
+          ></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">

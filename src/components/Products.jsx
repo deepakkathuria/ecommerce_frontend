@@ -1,10 +1,10 @@
+
+
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
-
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -43,14 +43,17 @@ const Products = () => {
         ],
       };
 
-      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(cartItem),
-      });
+      const response = await fetch(
+        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(cartItem),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to add product to cart");
@@ -71,7 +74,9 @@ const Products = () => {
     const getProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/products");
+        const response = await fetch(
+          "https://hammerhead-app-jkdit.ondigitalocean.app/products"
+        );
         const result = await response.json();
 
         if (componentMounted) {
@@ -165,10 +170,13 @@ const Products = () => {
           </button>
         ))}
       </div>
-
-      <div className="row">
+      <div className="row g-0 gx-0 gy-0 p-0 m-0">
         {filter.map((product) => (
-          <ProductCard key={product.id} product={product} addProductToCart={addProductToCart} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            addProductToCart={addProductToCart}
+          />
         ))}
       </div>
     </>
@@ -190,10 +198,19 @@ const Products = () => {
 };
 
 /**
- * Product Card with Image Scrolling
+ * Product Card with Clickable Image
  */
+
+
+
+
 const ProductCard = ({ product, addProductToCart }) => {
   const [currentImage, setCurrentImage] = useState(0);
+
+  // Calculate Discount Price (10% OFF)
+  const discountPercentage = 10; // Change this to any percentage
+  const originalPrice = product.price;
+  const discountedPrice = (originalPrice - (originalPrice * discountPercentage) / 100).toFixed(2);
 
   const handleNextImage = () => {
     setCurrentImage((prev) => (prev + 1) % product.images.length);
@@ -206,40 +223,36 @@ const ProductCard = ({ product, addProductToCart }) => {
   };
 
   return (
-    <div className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4">
-      <div className="card text-center h-100">
+    <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.1rem" }}>
+      <div className="card text-center h-100 shadow-sm m-0">
         <div className="position-relative">
-          <img
-            className="card-img-top p-3"
-            src={product.images[currentImage]}
-            alt={product.title}
-            height={300}
-            style={{ objectFit: "contain" }}
-          />
-          {product.images.length > 1 && (
-            <>
-              <button
-                className="btn btn-sm btn-light position-absolute start-0 top-50"
-                onClick={handlePrevImage}
-                style={{ transform: "translateY(-50%)" }}
-              >
-                ◀
-              </button>
-              <button
-                className="btn btn-sm btn-light position-absolute end-0 top-50"
-                onClick={handleNextImage}
-                style={{ transform: "translateY(-50%)" }}
-              >
-                ▶
-              </button>
-            </>
-          )}
+          <Link to={`/product/${product.id}`}>
+            <img
+              className="card-img-top"
+              src={product.images[currentImage]}
+              alt={product.title}
+              style={{
+                width: "100%",
+                height: "240px",
+                objectFit: "cover",
+              }}
+            />
+          </Link>
         </div>
+
         <div className="card-body">
           <h5 className="card-title">{product.title}</h5>
-          <p className="card-text">{product.description.substring(0, 90)}...</p>
-          <h6 className="lead">Rs.{product.price}</h6>
-          <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
+          
+          {/* ✅ Product Price with Discount Display */}
+          <h6 className="lead">
+            <del style={{ color: "red", marginRight: "5px" }}>Rs.{originalPrice}</del>
+            <span style={{ fontWeight: "bold", color: "#000" }}>Rs.{discountedPrice}</span>
+            <span style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}>
+              ({discountPercentage}% OFF)
+            </span>
+          </h6>
+
+          {/* <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
             Buy Now
           </Link>
           <button
@@ -247,11 +260,12 @@ const ProductCard = ({ product, addProductToCart }) => {
             onClick={() => addProductToCart(product)}
           >
             Add to Cart
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
   );
 };
+
 
 export default Products;
