@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
@@ -200,17 +198,15 @@ const Products = () => {
 /**
  * Product Card with Clickable Image
  */
-
-
-
-
 const ProductCard = ({ product, addProductToCart }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
-  // Calculate Discount Price (10% OFF)
+  // Calculate Discount Price (10% OFF) and round off to nearest integer
   const discountPercentage = 10; // Change this to any percentage
   const originalPrice = product.price;
-  const discountedPrice = (originalPrice - (originalPrice * discountPercentage) / 100).toFixed(2);
+  const discountedPrice = Math.round(
+    originalPrice - (originalPrice * discountPercentage) / 100
+  );
 
   const handleNextImage = () => {
     setCurrentImage((prev) => (prev + 1) % product.images.length);
@@ -242,30 +238,25 @@ const ProductCard = ({ product, addProductToCart }) => {
 
         <div className="card-body">
           <h5 className="card-title">{product.title}</h5>
-          
+
           {/* ✅ Product Price with Discount Display */}
           <h6 className="lead">
-            <del style={{ color: "red", marginRight: "5px" }}>Rs.{originalPrice}</del>
-            <span style={{ fontWeight: "bold", color: "#000" }}>Rs.{discountedPrice}</span>
-            <span style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}>
+            <del style={{ color: "red", marginRight: "5px" }}>
+              Rs.{originalPrice}
+            </del>
+            <span style={{ fontWeight: "bold", color: "#000" }}>
+              Rs.{discountedPrice}
+            </span>
+            <span
+              style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}
+            >
               ({discountPercentage}% OFF)
             </span>
           </h6>
-
-          {/* <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
-            Buy Now
-          </Link>
-          <button
-            className="btn btn-dark m-1"
-            onClick={() => addProductToCart(product)}
-          >
-            Add to Cart
-          </button> */}
         </div>
       </div>
     </div>
   );
 };
-
 
 export default Products;
