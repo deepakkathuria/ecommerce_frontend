@@ -19,10 +19,13 @@ const Product = () => {
   let touchEndX = 0;
 
   /**
-   * Add Product to Cart with Token Authentication
+   * ✅ Add Product to Cart with Token Authentication
    */
   const addProductToCart = async (product) => {
+    console.log("🟢 Add to Cart Clicked for:", product);
+
     const token = localStorage.getItem("apitoken");
+    console.log("🟠 Retrieved Token:", token);
 
     if (!token) {
       toast.error("You need to log in to add items to the cart!");
@@ -43,6 +46,8 @@ const Product = () => {
         ],
       };
 
+      console.log("🟢 Sending Request with Data:", cartItem);
+
       const response = await fetch(
         "https://hammerhead-app-jkdit.ondigitalocean.app/cart/add",
         {
@@ -55,20 +60,23 @@ const Product = () => {
         }
       );
 
+      console.log("🟠 API Response:", response);
+
       if (!response.ok) {
-        throw new Error("Failed to add product to cart");
+        const errorData = await response.json();
+        throw new Error(`Failed to add product to cart: ${errorData.error}`);
       }
 
-      toast.success("Product added to cart successfully!");
+      toast.success("✅ Product added to cart successfully!");
       dispatch(addCart(product));
     } catch (error) {
-      console.error("Error adding product to cart:", error);
+      console.error("❌ Error adding product to cart:", error);
       toast.error("Failed to add product to cart.");
     }
   };
 
   /**
-   * Fetch Product and Images
+   * ✅ Fetch Product and Images
    */
   useEffect(() => {
     const getProduct = async () => {
@@ -78,6 +86,8 @@ const Product = () => {
           `https://hammerhead-app-jkdit.ondigitalocean.app/product/${id}`
         );
         const result = await response.json();
+
+        console.log("🔹 API Response Data:", result);
 
         if (result.status === 200 && result.rows.length > 0) {
           const productData = result.rows[0];
@@ -104,7 +114,7 @@ const Product = () => {
           setSelectedImage(productImages[0]); // Set first image as default
         }
       } catch (error) {
-        console.error("Error fetching product details:", error);
+        console.error("❌ Error fetching product details:", error);
       } finally {
         setLoading(false);
       }
@@ -114,14 +124,14 @@ const Product = () => {
   }, [id]);
 
   /**
-   * Change Main Image on Thumbnail Click
+   * ✅ Change Main Image on Thumbnail Click
    */
   const handleImageClick = (image) => {
     setSelectedImage(image);
   };
 
   /**
-   * Handle Swipe Gesture on Mobile
+   * ✅ Handle Swipe Gesture on Mobile
    */
   const handleTouchStart = (e) => {
     touchStartX = e.touches[0].clientX;
@@ -149,13 +159,13 @@ const Product = () => {
   };
 
   /**
-   * Show Product with Multi-Image Gallery and Swipe Functionality
+   * ✅ Show Product with Multi-Image Gallery and Swipe Functionality
    */
   const ShowProduct = () => {
     return (
       <div className="container my-5 py-2">
         <div className="row">
-          {/* Left Side Thumbnail List (VERTICAL ON DESKTOP, HORIZONTAL ON MOBILE) */}
+          {/* Left Side Thumbnail List */}
           <div className="col-md-1 d-none d-md-flex flex-column align-items-center">
             {images.map((img, index) => (
               <img
@@ -176,7 +186,7 @@ const Product = () => {
             ))}
           </div>
 
-          {/* Main Image Display with Swipe Events */}
+          {/* Main Image Display */}
           <div className="col-md-6 col-sm-12 py-3">
             <img
               className="img-fluid"
@@ -190,32 +200,6 @@ const Product = () => {
             />
           </div>
 
-          {/* Thumbnails - HORIZONTAL ON MOBILE */}
-          <div className="d-md-none mt-3">
-            <div
-              className="d-flex justify-content-start overflow-auto"
-              style={{ gap: "10px", paddingBottom: "10px" }}
-            >
-              {images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Thumbnail ${index + 1}`}
-                  className={`img-thumbnail ${
-                    selectedImage === img ? "border-primary" : ""
-                  }`}
-                  style={{
-                    cursor: "pointer",
-                    width: "60px",
-                    height: "60px",
-                    objectFit: "cover",
-                  }}
-                  onClick={() => handleImageClick(img)}
-                />
-              ))}
-            </div>
-          </div>
-
           {/* Product Details */}
           <div className="col-md-5 col-sm-12 py-5">
             <h4 className="text-uppercase text-muted">{product.category}</h4>
@@ -224,7 +208,7 @@ const Product = () => {
               {product.rating?.rate} <i className="fa fa-star"></i>
             </p>
 
-            {/* Pricing with Discount (Rounded Off) */}
+            {/* Pricing */}
             <h3 className="display-6 my-4">
               <del style={{ color: "red", marginRight: "5px" }}>
                 Rs.{product.price}
@@ -241,7 +225,10 @@ const Product = () => {
 
             {/* Buttons */}
             <div className="d-flex mt-3">
-              <button className="btn btn-dark btn-sm flex-grow-1 mr-2">
+              <button
+                className="btn btn-dark btn-sm flex-grow-1 mr-2"
+                onClick={() => addProductToCart(product)}
+              >
                 🛒 ADD TO CART
               </button>
               <Link to="/cart" className="btn btn-dark btn-sm flex-grow-1">

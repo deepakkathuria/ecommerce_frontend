@@ -21,6 +21,7 @@ const Products = () => {
    */
   const addProductToCart = async (product) => {
     const token = localStorage.getItem("apitoken");
+    console.log(token,"ttttttttttooooooooooooooooooooooookkkkkkkkkkkkkkk")
 
     if (!token) {
       toast.error("You need to log in to add items to the cart!");
@@ -52,6 +53,7 @@ const Products = () => {
           body: JSON.stringify(cartItem),
         }
       );
+      console.log(response,"reposnefromapi")
 
       if (!response.ok) {
         throw new Error("Failed to add product to cart");
