@@ -1,22 +1,70 @@
+import React, { useEffect, useState } from "react";
+
 const Addresses = () => {
-    const addresses = [
-      { id: 1, address: "123 Main St, New York, NY 10001" },
-      { id: 2, address: "456 Elm St, San Francisco, CA 94101" },
-    ];
-  
-    return (
-      <div>
-        <h4>Addresses</h4>
-        {addresses.map((addr) => (
-          <div key={addr.id} className="mb-3">
-            <p>{addr.address}</p>
-            <button className="btn btn-outline-danger btn-sm">Remove</button>
-          </div>
-        ))}
-        <button className="btn btn-primary">Add New Address</button>
-      </div>
-    );
+  const [addresses, setAddresses] = useState([]);
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      const token = localStorage.getItem("apitoken");
+      if (!token) return;
+
+      try {
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/orders/address", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setAddresses(data.addresses);
+        }
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
+
+  const handleRemove = async (id) => {
+    const token = localStorage.getItem("apitoken");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/orders/address/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setAddresses(addresses.filter((addr) => addr.address_id !== id));
+      }
+    } catch (error) {
+      console.error("Error removing address:", error);
+    }
   };
-  
-  export default Addresses;
-  
+
+  return (
+    <div>
+      <h4>Addresses</h4>
+      {addresses.length === 0 ? (
+        <p>No addresses found.</p>
+      ) : (
+        addresses.map((addr) => (
+          <div key={addr.address_id} className="mb-3">
+            <p>{addr.street_address}, {addr.city}, {addr.state}</p>
+            <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(addr.address_id)}>
+              Remove
+            </button>
+          </div>
+        ))
+      )}
+      <button className="btn btn-primary">Add New Address</button>
+    </div>
+  );
+};
+
+export default Addresses;

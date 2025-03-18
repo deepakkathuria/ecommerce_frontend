@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Routes, Route } from "react-router-dom";
+import { NavLink, Routes, Route, Navigate } from "react-router-dom";
 import UserDetails from "./UserDetails";
 import Orders from "./Orders";
 import Wishlist from "./Wishlist";
@@ -22,8 +22,8 @@ const Profile = () => {
                 <NavLink
                   to="/profile"
                   end
-                  className={({ isActive }) =>
-                    isActive ? "active text-decoration-none" : "text-decoration-none"
+                  className={({ isActive }) => 
+                    isActive ? "active text-decoration-none fw-bold" : "text-decoration-none"
                   }
                 >
                   User Details
@@ -32,38 +32,38 @@ const Profile = () => {
               <li className="list-group-item">
                 <NavLink
                   to="/profile/orders"
-                  className={({ isActive }) =>
-                    isActive ? "active text-decoration-none" : "text-decoration-none"
+                  className={({ isActive }) => 
+                    isActive ? "active text-decoration-none fw-bold" : "text-decoration-none"
                   }
                 >
                   My Orders
                 </NavLink>
               </li>
-              <li className="list-group-item">
+              {/* <li className="list-group-item">
                 <NavLink
                   to="/profile/wishlist"
-                  className={({ isActive }) =>
-                    isActive ? "active text-decoration-none" : "text-decoration-none"
+                  className={({ isActive }) => 
+                    isActive ? "active text-decoration-none fw-bold" : "text-decoration-none"
                   }
                 >
                   Wishlist
                 </NavLink>
-              </li>
-              <li className="list-group-item">
+              </li> */}
+              {/* <li className="list-group-item">
                 <NavLink
                   to="/profile/addresses"
-                  className={({ isActive }) =>
-                    isActive ? "active text-decoration-none" : "text-decoration-none"
+                  className={({ isActive }) => 
+                    isActive ? "active text-decoration-none fw-bold" : "text-decoration-none"
                   }
                 >
                   Addresses
                 </NavLink>
-              </li>
+              </li> */}
               <li className="list-group-item">
                 <NavLink
                   to="/profile/settings"
-                  className={({ isActive }) =>
-                    isActive ? "active text-decoration-none" : "text-decoration-none"
+                  className={({ isActive }) => 
+                    isActive ? "active text-decoration-none fw-bold" : "text-decoration-none"
                   }
                 >
                   Settings
@@ -76,10 +76,11 @@ const Profile = () => {
           <div className="col-md-9">
             <div className="card p-4">
               <Routes>
-                <Route path="/" element={<UserDetails />} />
+                <Route path="/" element={<Navigate to="/profile/details" />} />
+                <Route path="/details" element={<UserDetails />} />
                 <Route path="/orders" element={<Orders />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/addresses" element={<Addresses />} />
+                {/* <Route path="/wishlist" element={<Wishlist />} /> */}
+                {/* <Route path="/addresses" element={<Addresses />} /> */}
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </div>
