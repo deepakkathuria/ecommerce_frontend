@@ -5,6 +5,7 @@ import { clearCart } from "../redux/action";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Fix for mobile menu
   const state = useSelector((state) => state.handleCart);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const Navbar = () => {
   };
 
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev); // Fix for mobile menu
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
@@ -51,59 +53,48 @@ const Navbar = () => {
           />
         </NavLink>
 
-        {/* Cart Button (Now outside the collapsible menu) */}
+        {/* Cart Button (Visible in Mobile View) */}
         <NavLink to="/cart" className="btn btn-outline-dark mx-2 d-lg-none">
           <i className="fa fa-cart-shopping mr-1"></i> Cart ({state.length})
         </NavLink>
 
-        {/* Hamburger Toggle */}
+        {/* Hamburger Toggle (Fixed) */}
         <button
           className="navbar-toggler mx-2 p-1 p-md-2"
           type="button"
-          data-toggle="collapse"
-          data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
+          onClick={toggleMobileMenu} // Using React state
+          aria-expanded={isMobileMenuOpen}
           aria-label="Toggle navigation"
-          style={{
-            width: "35px", 
-            height: "35px", 
-          }}
+          style={{ width: "35px", height: "35px" }}
         >
-          <span
-            className="navbar-toggler-icon"
-            style={{
-              width: "22px", 
-              height: "22px", 
-            }}
-          ></span>
+          <span className="navbar-toggler-icon"></span>
         </button>
 
         {/* Navbar Links */}
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <div className={`collapse navbar-collapse ${isMobileMenuOpen ? "show" : ""}`} id="navbarSupportedContent">
           <ul className="navbar-nav m-auto my-2 text-center">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/">
+              <NavLink className="nav-link" to="/" onClick={toggleMobileMenu}>
                 Home
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/product">
+              <NavLink className="nav-link" to="/product" onClick={toggleMobileMenu}>
                 Products
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/about">
+              <NavLink className="nav-link" to="/about" onClick={toggleMobileMenu}>
                 About
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/contact">
+              <NavLink className="nav-link" to="/contact" onClick={toggleMobileMenu}>
                 Contact
               </NavLink>
             </li>
 
-            {/* Profile Dropdown (Now visible in mobile view as well) */}
+            {/* Profile Dropdown (Mobile View) */}
             <li className="nav-item dropdown d-lg-none">
               <button
                 className="btn btn-outline-dark dropdown-toggle w-100"
@@ -113,41 +104,43 @@ const Navbar = () => {
               >
                 Profile
               </button>
-              <ul
-                className={`dropdown-menu dropdown-menu-end w-100 ${
-                  isDropdownOpen ? "show" : ""
-                }`}
-              >
+              <ul className={`dropdown-menu dropdown-menu-end w-100 ${isDropdownOpen ? "show" : ""}`}>
+                <li><NavLink className="dropdown-item" to="/profile" onClick={toggleMobileMenu}>My Profile</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/profile/orders" onClick={toggleMobileMenu}>My Orders</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/profile/wishlist" onClick={toggleMobileMenu}>Wishlist</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/profile/settings" onClick={toggleMobileMenu}>Settings</NavLink></li>
                 <li>
-                  <NavLink className="dropdown-item" to="/profile">
-                    My Profile
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/profile/orders">
-                    My Orders
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/profile/wishlist">
-                    Wishlist
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/profile/settings">
-                    Settings
-                  </NavLink>
-                </li>
-                <li>
-                  <button className="dropdown-item" onClick={handleLogout}>
+                  <button className="dropdown-item" onClick={() => { handleLogout(); toggleMobileMenu(); }}>
                     Logout
                   </button>
                 </li>
               </ul>
             </li>
+
+            {/* Login/Register (Mobile View - FIXED) */}
+            {!localStorage.getItem("apitoken") ? (
+              <>
+                <li className="nav-item d-lg-none">
+                  <NavLink to="/login" className="btn btn-outline-dark m-2 w-100" onClick={toggleMobileMenu}>
+                    <i className="fa fa-sign-in-alt mr-1"></i> Login
+                  </NavLink>
+                </li>
+                <li className="nav-item d-lg-none">
+                  <NavLink to="/register" className="btn btn-outline-dark m-2 w-100" onClick={toggleMobileMenu}>
+                    <i className="fa fa-user-plus mr-1"></i> Register
+                  </NavLink>
+                </li>
+              </>
+            ) : (
+              <li className="nav-item d-lg-none">
+                <button onClick={() => { handleLogout(); toggleMobileMenu(); }} className="btn btn-outline-dark m-2 w-100">
+                  <i className="fa fa-sign-out-alt mr-1"></i> Logout
+                </button>
+              </li>
+            )}
           </ul>
 
-          {/* Right Side Buttons (Only for Desktop) */}
+          {/* Right Side Buttons (Desktop View) */}
           <div className="buttons text-center d-none d-lg-block">
             <NavLink to="/cart" className="btn btn-outline-dark m-2">
               <i className="fa fa-cart-shopping mr-1"></i> Cart ({state.length})
@@ -167,49 +160,6 @@ const Navbar = () => {
                 </NavLink>
               </>
             )}
-
-            {/* Profile Dropdown for Desktop */}
-            <div className="dropdown d-inline">
-              <button
-                className="btn btn-outline-dark dropdown-toggle"
-                type="button"
-                onClick={toggleDropdown}
-                aria-expanded={isDropdownOpen}
-              >
-                Profile
-              </button>
-              <ul
-                className={`dropdown-menu dropdown-menu-end ${
-                  isDropdownOpen ? "show" : ""
-                }`}
-              >
-                <li>
-                  <NavLink className="dropdown-item" to="/profile">
-                    My Profile
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/profile/orders">
-                    My Orders
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/profile/wishlist">
-                    Wishlist
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/profile/settings">
-                    Settings
-                  </NavLink>
-                </li>
-                <li>
-                  <button className="dropdown-item" onClick={handleLogout}>
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </div>
           </div>
 
         </div>
