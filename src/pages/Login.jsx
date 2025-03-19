@@ -13,6 +13,49 @@ const Login = () => {
   const dispatch = useDispatch(); // Initialize dispatch
 
 
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError("");
+  
+  //   try {
+  //     const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/auth/signin", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //     });
+  
+  //     const data = await response.json();
+  
+  //     if (!response.ok) {
+  //       throw new Error(data.message || "Login failed");
+  //     }
+  
+  //     // Store token
+  //     localStorage.setItem("apitoken", data.token);
+  
+  //     // Fetch and sync cart
+  //     const cartResponse = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+  //       headers: {
+  //         Authorization: `Bearer ${data.token}`,
+  //       },
+  //     });
+  
+  //     const cartData = await cartResponse.json();
+  //     dispatch(syncCart(cartData.cartItems)); // Sync Redux with backend cart
+  
+  //     // Redirect to Home
+  //     navigate("/");
+  //   } catch (err) {
+  //     setError(err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -21,32 +64,26 @@ const Login = () => {
     try {
       const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/auth/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
   
       const data = await response.json();
-  
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
   
-      // Store token
+      // ✅ Store token correctly
       localStorage.setItem("apitoken", data.token);
   
-      // Fetch and sync cart
+      // ✅ Fetch cart after login and sync with Redux
       const cartResponse = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
+        headers: { Authorization: `Bearer ${data.token}` },
       });
   
       const cartData = await cartResponse.json();
-      dispatch(syncCart(cartData.cartItems)); // Sync Redux with backend cart
+      dispatch(syncCart(cartData.cartItems || [])); // ✅ Restore cart on login
   
-      // Redirect to Home
       navigate("/");
     } catch (err) {
       setError(err.message);
@@ -54,7 +91,8 @@ const Login = () => {
       setLoading(false);
     }
   };
-
+  
+  
   return (
     <>
       <Navbar />
