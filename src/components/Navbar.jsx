@@ -12,22 +12,19 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   const token = localStorage.getItem("apitoken");
-  const isLoggedIn = token && !isTokenExpired(token);
+  const [isLoggedIn, setIsLoggedIn] = useState(token && !isTokenExpired(token));
 
-  // ✅ Auto-logout when token is expired
   useEffect(() => {
     if (token && isTokenExpired(token)) {
       localStorage.removeItem("apitoken");
       dispatch(clearCart());
+      setIsLoggedIn(false);
       navigate("/login");
     }
   }, [token, dispatch, navigate]);
 
-  // 🔒 Logout function
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("apitoken");
-
       await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear", {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -35,6 +32,7 @@ const Navbar = () => {
 
       localStorage.removeItem("apitoken");
       dispatch(clearCart());
+      setIsLoggedIn(false);
       navigate("/login");
     } catch (err) {
       console.error("Logout failed:", err);
@@ -46,44 +44,80 @@ const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
-      <div className="container">
-        {/* Logo */}
-        <NavLink className="navbar-brand fw-bold fs-4 px-2" to="/">
-          <img
-            src="/assets/logo1.png"
-            alt="DK Ecommerce Logo"
-            className="d-block mx-auto d-md-none"
-            width="100"
-            height="50"
-          />
-          <img
-            src="/assets/logo1.png"
-            alt="DK Ecommerce Logo"
-            className="d-none d-md-block mx-auto"
-            width="150"
-            height="100"
-          />
+      <div className="container-fluid d-flex justify-content-between align-items-center px-3">
+        
+        {/* 🔹 Logo (Left) */}
+        <NavLink className="navbar-brand fw-bold fs-4" to="/">
+          <img src="/assets/logo1.png" alt="DK Ecommerce Logo" width="140" height="50" />
         </NavLink>
 
-        {/* Cart Button (Mobile) */}
-        <NavLink to="/cart" className="btn btn-outline-dark mx-2 d-lg-none">
-          <i className="fa fa-cart-shopping mr-1"></i> Cart ({state.length})
-        </NavLink>
+        {/* 🔹 Centered Navbar Links (Only Visible in Desktop) */}
+        <div className="d-none d-lg-block mx-auto">
+          <ul className="navbar-nav flex-row gap-4 text-center">
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/">Home</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/product">Products</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/about">About</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/contact">Contact</NavLink>
+            </li>
+          </ul>
+        </div>
 
-        {/* Hamburger */}
-        <button
-          className="navbar-toggler mx-2 p-1 p-md-2"
-          type="button"
-          onClick={toggleMobileMenu}
-          aria-expanded={isMobileMenuOpen}
-          aria-label="Toggle navigation"
-          style={{ width: "35px", height: "35px" }}
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        {/* 🔹 Right Side Buttons - Properly Aligned in One Row */}
+        <div className="d-flex align-items-center gap-2">
+          {!isLoggedIn ? (
+            <>
+              <NavLink to="/login" className="btn btn-dark btn-sm">
+                <i className="fa fa-sign-in-alt"></i> Login
+              </NavLink>
+              <NavLink to="/register" className="btn btn-outline-dark btn-sm">
+                <i className="fa fa-user-plus"></i> Register
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink to="/cart" className="btn btn-outline-dark btn-sm">
+                <i className="fa fa-cart-shopping"></i> Cart ({state.length})
+              </NavLink>
 
-        <div className={`collapse navbar-collapse ${isMobileMenuOpen ? "show" : ""}`} id="navbarSupportedContent">
-          <ul className="navbar-nav m-auto my-2 text-center">
+              <div className="dropdown">
+                <button className="btn btn-outline-dark btn-sm dropdown-toggle" type="button" onClick={toggleDropdown}>
+                  Profile
+                </button>
+                <ul className={`dropdown-menu dropdown-menu-end ${isDropdownOpen ? "show" : ""}`}>
+                  <li><NavLink className="dropdown-item" to="/profile">My Profile</NavLink></li>
+                  <li><NavLink className="dropdown-item" to="/profile/orders">My Orders</NavLink></li>
+                  <li><NavLink className="dropdown-item" to="/profile/wishlist">Wishlist</NavLink></li>
+                  <li><NavLink className="dropdown-item" to="/profile/settings">Settings</NavLink></li>
+                  <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
+                </ul>
+              </div>
+            </>
+          )}
+
+          {/* 🔹 Hamburger Icon (Always Last) */}
+          <button
+            className="navbar-toggler"
+            type="button"
+            onClick={toggleMobileMenu}
+            aria-expanded={isMobileMenuOpen}
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+
+      {/* 🔹 Mobile Menu Links (Inside Hamburger) */}
+      {isMobileMenuOpen && (
+        <div className="bg-light p-3 d-lg-none">
+          <ul className="navbar-nav text-center">
             <li className="nav-item">
               <NavLink className="nav-link" to="/" onClick={toggleMobileMenu}>Home</NavLink>
             </li>
@@ -96,77 +130,9 @@ const Navbar = () => {
             <li className="nav-item">
               <NavLink className="nav-link" to="/contact" onClick={toggleMobileMenu}>Contact</NavLink>
             </li>
-
-            {/* Mobile Profile Dropdown */}
-            {isLoggedIn && (
-              <li className="nav-item dropdown d-lg-none">
-                <button
-                  className="btn btn-outline-dark dropdown-toggle w-50"
-                  type="button"
-                  onClick={toggleDropdown}
-                  aria-expanded={isDropdownOpen}
-                >
-                  Profile
-                </button>
-                <ul className={`dropdown-menu dropdown-menu-end w-50 ${isDropdownOpen ? "show" : ""}`}>
-                  <li><NavLink className="dropdown-item" to="/profile" onClick={toggleMobileMenu}>My Profile</NavLink></li>
-                  <li><NavLink className="dropdown-item" to="/profile/orders" onClick={toggleMobileMenu}>My Orders</NavLink></li>
-                  <li><NavLink className="dropdown-item" to="/profile/wishlist" onClick={toggleMobileMenu}>Wishlist</NavLink></li>
-                  <li><NavLink className="dropdown-item" to="/profile/settings" onClick={toggleMobileMenu}>Settings</NavLink></li>
-                  <li>
-                    <button className="dropdown-item" onClick={() => { handleLogout(); toggleMobileMenu(); }}>
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              </li>
-            )}
-
-            {/* Mobile Login/Register */}
-            {!isLoggedIn && (
-              <>
-                <li className="nav-item d-lg-none">
-                  <NavLink to="/login" className="btn btn m-2 w-50" onClick={toggleMobileMenu}>
-                    <i className="fa fa-sign-in-alt mr-1"></i> Login
-                  </NavLink>
-                </li>
-                <li className="nav-item d-lg-none">
-                  <NavLink to="/register" className="btn btn m-2 w-50" onClick={toggleMobileMenu}>
-                    <i className="fa fa-user-plus mr-1"></i> Register
-                  </NavLink>
-                </li>
-              </>
-            )}
           </ul>
-
-          {/* Desktop Right Side */}
-          <div className="buttons text-center d-none d-lg-block">
-            <NavLink to="/cart" className="btn btn-outline-dark m-2">
-              <i className="fa fa-cart-shopping mr-1"></i> Cart ({state.length})
-            </NavLink>
-
-            {isLoggedIn && (
-              <div className="dropdown d-none d-lg-inline-block">
-                <button
-                  className="btn btn-outline-dark dropdown-toggle"
-                  type="button"
-                  onClick={toggleDropdown}
-                  aria-expanded={isDropdownOpen}
-                >
-                  Profile
-                </button>
-                <ul className={`dropdown-menu dropdown-menu-end ${isDropdownOpen ? "show" : ""}`}>
-                  <li><NavLink className="dropdown-item" to="/profile">My Profile</NavLink></li>
-                  <li><NavLink className="dropdown-item" to="/profile/orders">My Orders</NavLink></li>
-                  <li><NavLink className="dropdown-item" to="/profile/wishlist">Wishlist</NavLink></li>
-                  <li><NavLink className="dropdown-item" to="/profile/settings">Settings</NavLink></li>
-                  <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
-                </ul>
-              </div>
-            )}
-          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };
