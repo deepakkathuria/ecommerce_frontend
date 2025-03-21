@@ -46,44 +46,46 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
       <div className="container-fluid d-flex justify-content-between align-items-center px-3">
         
-        {/* 🔹 Logo (Left) */}
+        {/* 🔹 Logo (Always Left) */}
         <NavLink className="navbar-brand fw-bold fs-4" to="/">
-          <img src="/assets/logo1.png" alt="DK Ecommerce Logo" width="140" height="50" />
+          <img src="/assets/logo1.png" alt="DK Ecommerce Logo" width="110" height="40" />
         </NavLink>
 
-        {/* 🔹 Centered Navbar Links (Only Visible in Desktop) */}
-        <div className="d-none d-lg-block mx-auto">
-          <ul className="navbar-nav flex-row gap-4 text-center">
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/">Home</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/product">Products</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/about">About</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/contact">Contact</NavLink>
-            </li>
-          </ul>
-        </div>
-
-        {/* 🔹 Right Side Buttons - Properly Aligned in One Row */}
-        <div className="d-flex align-items-center gap-2">
+        {/* 🔹 Right Side (Icons for Mobile, Full Buttons for Desktop) */}
+        <div className="d-flex align-items-center gap-3">
           {!isLoggedIn ? (
             <>
-              <NavLink to="/login" className="btn btn-dark btn-sm">
-                <i className="fa fa-sign-in-alt"></i> Login
+              {/* ✅ Mobile: Show Icons Only */}
+              <NavLink to="/login" className="btn btn-dark btn-sm d-lg-none">
+                <i className="fa-solid fa-key"></i>
               </NavLink>
-              <NavLink to="/register" className="btn btn-outline-dark btn-sm">
-                <i className="fa fa-user-plus"></i> Register
+              <NavLink to="/register" className="btn btn-outline-dark btn-sm d-lg-none">
+                <i className="fa-solid fa-user-plus"></i>
+              </NavLink>
+
+              {/* ✅ Desktop: Show Full Buttons */}
+              <NavLink to="/login" className="btn btn-dark btn-sm d-none d-lg-inline">
+                <i className="fa-solid fa-key"></i> Login
+              </NavLink>
+              <NavLink to="/register" className="btn btn-outline-dark btn-sm d-none d-lg-inline">
+                <i className="fa-solid fa-user-plus"></i> Register
               </NavLink>
             </>
           ) : (
             <>
-              <NavLink to="/cart" className="btn btn-outline-dark btn-sm">
-                <i className="fa fa-cart-shopping"></i> Cart ({state.length})
+              {/* ✅ Mobile: Cart Icon with Badge */}
+              <NavLink to="/cart" className="btn btn-outline-dark btn-sm d-lg-none position-relative">
+                <i className="fa fa-shopping-cart"></i>
+                {state.length > 0 && (
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {state.length}
+                  </span>
+                )}
+              </NavLink>
+
+              {/* ✅ Desktop: Full Cart Button with Count */}
+              <NavLink to="/cart" className="btn btn-outline-dark btn-sm d-none d-lg-inline">
+                <i className="fa fa-shopping-cart"></i> Cart ({state.length})
               </NavLink>
 
               <div className="dropdown">
@@ -118,18 +120,10 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="bg-light p-3 d-lg-none">
           <ul className="navbar-nav text-center">
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/" onClick={toggleMobileMenu}>Home</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/product" onClick={toggleMobileMenu}>Products</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/about" onClick={toggleMobileMenu}>About</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/contact" onClick={toggleMobileMenu}>Contact</NavLink>
-            </li>
+            <li className="nav-item"><NavLink className="nav-link" to="/" onClick={toggleMobileMenu}>Home</NavLink></li>
+            <li className="nav-item"><NavLink className="nav-link" to="/product" onClick={toggleMobileMenu}>Products</NavLink></li>
+            <li className="nav-item"><NavLink className="nav-link" to="/about" onClick={toggleMobileMenu}>About</NavLink></li>
+            <li className="nav-item"><NavLink className="nav-link" to="/contact" onClick={toggleMobileMenu}>Contact</NavLink></li>
           </ul>
         </div>
       )}
