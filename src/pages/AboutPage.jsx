@@ -1,67 +1,40 @@
-import React from 'react'
+import React from 'react';
 import { Footer, Navbar } from "../components";
+
 const AboutPage = () => {
   return (
     <>
       <Navbar />
-      <div className="container my-3 py-3">
-        <h1 className="text-center">About Us</h1>
-        <hr />
-        <p className="lead text-center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum
-          facere doloremque veritatis odit similique sequi. Odit amet fuga nam
-          quam quasi facilis sed doloremque saepe sint perspiciatis explicabo
-          totam vero quas provident ipsam, veritatis nostrum velit quos
-          recusandae est mollitia esse fugit dolore laudantium. Ex vel explicabo
-          earum unde eligendi autem praesentium, doloremque distinctio nesciunt
-          porro tempore quis eaque labore voluptatibus ea necessitatibus
-          exercitationem tempora molestias. Ad consequuntur veniam sequi ullam
-          tempore vel tenetur soluta dolore sunt maxime aliquam corporis est,
-          quo saepe dolorem optio minus sint nemo totam dolorum! Reprehenderit
-          delectus expedita a alias nam recusandae illo debitis repellat libero,
-          quasi explicabo molestiae saepe, dolorem tempore itaque eveniet quam
-          dignissimos blanditiis excepturi harum numquam vel nihil? Ipsum
-        </p>
+      <div className="container my-5 py-4">
+        <h1 className="text-center fw-bold mb-4">✨ About Zairi ✨</h1>
+        <div className="bg-light rounded shadow p-4">
+          <h4 className="fw-bold mb-3 text-center text-uppercase">Hi Everyone!</h4>
+          <p style={{ fontSize: "1.1rem", lineHeight: "1.9", textAlign: "center" }}>
+            We at <strong>Zairi</strong>, have always been passionate about creativity and fashion,
+            which is why we started this journey into <strong>kawaii fashion and accessories</strong>! 
+            Right now, we’re bringing you the <strong>cutest jewelry</strong>, carefully curated for 
+            quality and style, but this is just the beginning!
+          </p>
+          <p style={{ fontSize: "1.1rem", lineHeight: "1.9", textAlign: "center" }}>
+            Big plans are in motion to expand into even more adorable and trendy 
+            <strong> kawaii products</strong>. 🎀💖 This isn’t just another shop — it’s a 
+            <strong> brand built with heart</strong>. Every piece is thoughtfully selected to 
+            bring <strong>joy, confidence</strong>, and a touch of <strong>magic</strong> 
+            to your everyday look. ❤️
+          </p>
+          <p style={{ fontSize: "1.1rem", lineHeight: "1.9", textAlign: "center" }}>
+            Your support means everything, and we would love for you to be part of this journey! 
+            Let’s make the world a little <strong>cuter, one accessory at a time</strong>. 🌸✨
+          </p>
 
-        {/* <h2 className="text-center py-4">Our Products</h2> */}
-        <div className="row">
-          {/* <div className="col-md-3 col-sm-6 mb-3 px-3">
-            <div className="card h-100">
-              <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
-              <div className="card-body">
-                <h5 className="card-title text-center">Mens's Clothing</h5>
-              </div>
-            </div>
-          </div> */}
-          {/* <div className="col-md-3 col-sm-6 mb-3 px-3">
-            <div className="card h-100">
-              <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
-              <div className="card-body">
-                <h5 className="card-title text-center">Women's Clothing</h5>
-              </div>
-            </div>
-          </div> */}
-          {/* <div className="col-md-3 col-sm-6 mb-3 px-3">
-            <div className="card h-100">
-              <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
-              <div className="card-body">
-                <h5 className="card-title text-center">Jewelery</h5>
-              </div>
-            </div>
-          </div> */}
-          {/* <div className="col-md-3 col-sm-6 mb-3 px-3">
-            <div className="card h-100">
-              <img className="card-img-top img-fluid" src="https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" height={160} />
-              <div className="card-body">
-                <h5 className="card-title text-center">Electronics</h5>
-              </div>
-            </div>
-          </div> */}
+          <p className="text-center mt-4 fw-bold" style={{ fontSize: "1.2rem" }}>
+            Z A I R I . I N
+          </p>
         </div>
       </div>
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default AboutPage
+export default AboutPage;

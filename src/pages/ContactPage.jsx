@@ -21,14 +21,14 @@ const ContactPage = () => {
             <h5 className="fw-bold mt-4">Email</h5>
             <p>
               <a href="mailto:enquiry@zairi.com" className="text-dark text-decoration-none">
-                enquiry@zairi.com
+              enquiryzairi@gmail.com
               </a>
             </p>
 
             <h5 className="fw-bold mt-4">Phone</h5>
             <p>
               <a href="tel:+918279751904" className="text-dark text-decoration-none">
-                +91-82797 51904
+                +91-8447145941
               </a>
             </p>
           </div>
