@@ -158,6 +158,57 @@ const Product = () => {
     }
   };
 
+  const handleBuyNow = async (product) => {
+    const token = localStorage.getItem("apitoken");
+  
+    if (!token) {
+      toast.error("Please login to continue.");
+      navigate("/login");
+      return;
+    }
+  
+    try {
+      const cartItem = {
+        items: [
+          {
+            id: product.id,
+            quantity: 1,
+            name: product.title,
+            price: product.price,
+            image: selectedImage || product.image,
+          },
+        ],
+      };
+  
+      const response = await fetch(
+        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(cartItem),
+        }
+      );
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Cart update failed");
+      }
+  
+      // 🛒 Update Redux cart
+      dispatch(addCart(product));
+  
+      toast.success("✅ Product added to cart. Redirecting to checkout...");
+      navigate("/cart");
+    } catch (err) {
+      console.error("Buy Now Error:", err);
+      toast.error("❌ Failed to proceed to checkout.");
+    }
+  };
+  
+
   /**
    * ✅ Show Product with Multi-Image Gallery and Swipe Functionality
    */
@@ -231,9 +282,16 @@ const Product = () => {
               >
                 🛒 ADD TO CART
               </button>
-              <Link to="/cart" className="btn btn-dark btn-sm flex-grow-1">
+              {/* <Link to="/cart" className="btn btn-dark btn-sm flex-grow-1">
                 ⚡ BUY NOW
-              </Link>
+              </Link> */}
+
+              <button
+                className="btn btn-dark btn-sm flex-grow-1"
+                onClick={() => handleBuyNow(product)}
+              >
+                ⚡ BUY NOW
+              </button>
             </div>
           </div>
         </div>
