@@ -9,5 +9,7 @@ export { default as Register } from './Register';
 export { default as Checkout } from './Checkout';
 export { default as Profile } from './Profile';
 export { default as OrderDetails } from './OrderDetails'; // ✅ Added this line
+export { default as InvoicePage } from './InvoicePage'; // ✅ Added this line
+
 
 export { default as PageNotFound } from './PageNotFound';

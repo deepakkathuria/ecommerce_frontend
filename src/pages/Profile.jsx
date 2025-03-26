@@ -52,11 +52,11 @@ const Profile = () => {
                   My Orders
                 </NavLink>
               </li>
-              <li className="list-group-item">
+              {/* <li className="list-group-item">
                 <NavLink to={`/profile/addresses/${latestOrderId}`} className={({ isActive }) => (isActive ? "active fw-bold" : "")}>
                   Addresses
                 </NavLink>
-              </li>
+              </li> */}
               <li className="list-group-item">
                 <NavLink to="/profile/settings" className={({ isActive }) => (isActive ? "active fw-bold" : "")}>
                   Settings

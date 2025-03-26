@@ -18,6 +18,7 @@ import {
   Checkout,
   Profile,
   OrderDetails,
+  InvoicePage,
   PageNotFound,
 } from "./pages";
 import ScrollToTop from "./components/ScrollToTop";
@@ -75,6 +76,9 @@ root.render(
           {/* Profile & Order Routes */}
           <Route path="/profile/*" element={<Profile />} />
           <Route path="/profile/orders/:orderId" element={<OrderDetails />} />
+
+          <Route path="/invoice/:orderId" element={<InvoicePage />} />
+
 
           {/* Catch-All Route */}
           <Route path="*" element={<PageNotFound />} />
