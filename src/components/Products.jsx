@@ -200,48 +200,128 @@ const Products = () => {
 /**
  * Product Card with Clickable Image
  */
-const ProductCard = ({ product, addProductToCart }) => {
+// const ProductCard = ({ product, addProductToCart }) => {
+//   const [currentImage, setCurrentImage] = useState(0);
+
+//   // Calculate Discount Price (10% OFF) and round off to nearest integer
+//   const discountPercentage = 10; // Change this to any percentage
+//   const originalPrice = product.price;
+//   const discountedPrice = Math.round(
+//     originalPrice - (originalPrice * discountPercentage) / 100
+//   );
+
+//   const handleNextImage = () => {
+//     setCurrentImage((prev) => (prev + 1) % product.images.length);
+//   };
+
+//   const handlePrevImage = () => {
+//     setCurrentImage((prev) =>
+//       prev === 0 ? product.images.length - 1 : prev - 1
+//     );
+//   };
+
+//   return (
+//     <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.1rem" }}>
+//       <div className="card text-center h-100 shadow-sm m-0">
+//         <div className="position-relative">
+//           <Link to={`/product/${product.id}`}>
+//             <img
+//               className="card-img-top"
+//               src={product.images[currentImage]}
+//               alt={product.title}
+//               style={{
+//                 width: "100%",
+//                 height: "240px",
+//                 objectFit: "cover",
+//               }}
+//             />
+//           </Link>
+//         </div>
+
+//         <div className="card-body">
+//           <h5 className="card-title">{product.title}</h5>
+
+//           {/* ✅ Product Price with Discount Display */}
+//           <h6 className="lead">
+//             <del style={{ color: "red", marginRight: "5px" }}>
+//               Rs.{originalPrice}
+//             </del>
+//             <span style={{ fontWeight: "bold", color: "#000" }}>
+//               Rs.{discountedPrice}
+//             </span>
+//             <span
+//               style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}
+//             >
+//               ({discountPercentage}% OFF)
+//             </span>
+//           </h6>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+const ProductCard = ({ product }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
-  // Calculate Discount Price (10% OFF) and round off to nearest integer
-  const discountPercentage = 10; // Change this to any percentage
+  const discountPercentage = 10;
   const originalPrice = product.price;
   const discountedPrice = Math.round(
     originalPrice - (originalPrice * discountPercentage) / 100
   );
 
-  const handleNextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % product.images.length);
-  };
-
-  const handlePrevImage = () => {
-    setCurrentImage((prev) =>
-      prev === 0 ? product.images.length - 1 : prev - 1
-    );
-  };
-
   return (
-    <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.1rem" }}>
+    <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.4rem" }}>
       <div className="card text-center h-100 shadow-sm m-0">
-        <div className="position-relative">
-          <Link to={`/product/${product.id}`}>
-            <img
-              className="card-img-top"
-              src={product.images[currentImage]}
-              alt={product.title}
-              style={{
-                width: "100%",
-                height: "240px",
-                objectFit: "cover",
-              }}
-            />
-          </Link>
-        </div>
+        <Link to={`/product/${product.id}`}>
+          <img
+            className="card-img-top"
+            src={product.images[currentImage]}
+            alt={product.title}
+            style={{
+              width: "100%",
+              height: "240px",
+              objectFit: "cover",
+              borderRadius: "5px",
+            }}
+          />
+        </Link>
+
+        {/* ✅ Thumbnail carousel below main image */}
+        {product.images.length > 1 && (
+          <div
+            className="d-flex justify-content-center mt-2 px-2"
+            style={{ overflowX: "auto" }}
+          >
+            {product.images.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Thumbnail ${index}`}
+                className={`img-thumbnail mx-1 ${
+                  index === currentImage ? "border-primary" : ""
+                }`}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                  borderRadius: "4px",
+                  border:
+                    index === currentImage
+                      ? "2px solid #007bff"
+                      : "1px solid #ddd",
+                }}
+                onClick={() => setCurrentImage(index)}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="card-body">
-          <h5 className="card-title">{product.title}</h5>
+          <h6 className="card-title mb-2">{product.title}</h6>
 
-          {/* ✅ Product Price with Discount Display */}
           <h6 className="lead">
             <del style={{ color: "red", marginRight: "5px" }}>
               Rs.{originalPrice}
@@ -260,5 +340,7 @@ const ProductCard = ({ product, addProductToCart }) => {
     </div>
   );
 };
+
+
 
 export default Products;
