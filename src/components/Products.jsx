@@ -54,7 +54,7 @@
 //           `http://localhost:5000/products?page=${page}&limit=16`
 //         );
 //         const result = await response.json();
-  
+
 //         const formattedData = result.rows.map((item) => {
 //           let images = [];
 //           try {
@@ -64,7 +64,7 @@
 //           } catch (e) {
 //             images = [];
 //           }
-  
+
 //           return {
 //             id: item.item_id,
 //             title: item.name || "No Title",
@@ -75,9 +75,9 @@
 //             images: images.length > 0 ? images : ["https://via.placeholder.com/150"],
 //           };
 //         });
-  
+
 //         const uniqueCategories = [...new Set(formattedData.map(item => item.category))];
-  
+
 //         setData(formattedData);
 //         setFilter(formattedData);
 //         setCategories(uniqueCategories);
@@ -88,10 +88,10 @@
 //         setLoading(false);
 //       }
 //     };
-  
+
 //     getProducts();
 //   }, [page]);
-  
+
 //   const filterProduct = (cat) => {
 //     if (cat === "all") {
 //       setFilter(data);
@@ -170,9 +170,6 @@
 // };
 
 // export default Products;
-
-
-
 
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -266,8 +263,7 @@ const Products = () => {
     setSelectedSubcategory(subcategory);
     const updated = data.filter(
       (item) =>
-        item.category === selectedCategory &&
-        item.subcategory === subcategory
+        item.category === selectedCategory && item.subcategory === subcategory
     );
     setFilter(updated);
   };
@@ -317,7 +313,9 @@ const Products = () => {
             <button
               key={index}
               className={`btn btn-sm m-1 ${
-                selectedSubcategory === sub ? "btn-success" : "btn-outline-success"
+                selectedSubcategory === sub
+                  ? "btn-success"
+                  : "btn-outline-success"
               }`}
               onClick={() => filterBySubcategory(sub)}
             >
@@ -374,11 +372,11 @@ const Products = () => {
 const ProductCard = ({ product }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
-  const discountPercentage = 10;
+  // const discountPercentage = 10;
   const originalPrice = product.price;
-  const discountedPrice = Math.round(
-    originalPrice - (originalPrice * discountPercentage) / 100
-  );
+  // const discountedPrice = Math.round(
+  //   originalPrice - (originalPrice * discountPercentage) / 100
+  // );
 
   return (
     <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.4rem" }}>
@@ -429,17 +427,10 @@ const ProductCard = ({ product }) => {
 
         <div className="card-body">
           <h6 className="card-title mb-2">{product.title}</h6>
+
           <h6 className="lead">
-            <del style={{ color: "red", marginRight: "5px" }}>
-              Rs.{originalPrice}
-            </del>
             <span style={{ fontWeight: "bold", color: "#000" }}>
-              Rs.{discountedPrice}
-            </span>
-            <span
-              style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}
-            >
-              ({discountPercentage}% OFF)
+              Rs.{originalPrice}
             </span>
           </h6>
         </div>

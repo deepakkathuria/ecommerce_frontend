@@ -567,16 +567,8 @@ const Product = () => {
             </h1>
 
             <h3 className="display-6 my-3">
-              <del style={{ color: "red", marginRight: "5px" }}>
-                Rs.{product.price}
-              </del>
               <span style={{ fontWeight: "bold", color: "#000" }}>
-                Rs.{Math.round(product.price * 0.9)}
-              </span>
-              <span
-                style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}
-              >
-                (10% OFF)
+                Rs.{product.price}
               </span>
             </h3>
 
