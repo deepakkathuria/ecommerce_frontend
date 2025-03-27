@@ -1,101 +1,232 @@
+// import React, { useState, useEffect } from "react";
+// import { useDispatch } from "react-redux";
+// import { addCart } from "../redux/action";
+// import Skeleton from "react-loading-skeleton";
+// import "react-loading-skeleton/dist/skeleton.css";
+// import { Link, useNavigate } from "react-router-dom";
+// import toast from "react-hot-toast";
+
+// const Products = () => {
+//   const [data, setData] = useState([]);
+//   const [filter, setFilter] = useState([]);
+//   const [categories, setCategories] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [page, setPage] = useState(1);
+//   const [totalPages, setTotalPages] = useState(1);
+
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   const addProductToCart = async (product) => {
+//     const token = localStorage.getItem("apitoken");
+//     if (!token) {
+//       toast.error("Please log in to add items to cart!");
+//       navigate("/login");
+//       return;
+//     }
+
+//     try {
+//       const cartItem = {
+//         items: [{ id: product.id, quantity: 1, name: product.title, price: product.price, image: product.images[0] }],
+//       };
+//       const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         body: JSON.stringify(cartItem),
+//       });
+
+//       if (!response.ok) throw new Error("Cart error");
+//       toast.success("Product added to cart!");
+//       dispatch(addCart(product));
+//     } catch (err) {
+//       toast.error("Failed to add to cart");
+//     }
+//   };
+
+//   useEffect(() => {
+//     const getProducts = async () => {
+//       setLoading(true);
+//       try {
+//         const response = await fetch(
+//           `http://localhost:5000/products?page=${page}&limit=16`
+//         );
+//         const result = await response.json();
+  
+//         const formattedData = result.rows.map((item) => {
+//           let images = [];
+//           try {
+//             images = typeof item.images === "string"
+//               ? JSON.parse(item.images)
+//               : item.images;
+//           } catch (e) {
+//             images = [];
+//           }
+  
+//           return {
+//             id: item.item_id,
+//             title: item.name || "No Title",
+//             price: item.price || 0,
+//             description: item.description || "No description available",
+//             category: item.category || "Uncategorized",
+//             subcategory: item.subcategory || "",
+//             images: images.length > 0 ? images : ["https://via.placeholder.com/150"],
+//           };
+//         });
+  
+//         const uniqueCategories = [...new Set(formattedData.map(item => item.category))];
+  
+//         setData(formattedData);
+//         setFilter(formattedData);
+//         setCategories(uniqueCategories);
+//         setTotalPages(result.totalPages);
+//         setLoading(false);
+//       } catch (error) {
+//         console.error("Error fetching products:", error);
+//         setLoading(false);
+//       }
+//     };
+  
+//     getProducts();
+//   }, [page]);
+  
+//   const filterProduct = (cat) => {
+//     if (cat === "all") {
+//       setFilter(data);
+//     } else {
+//       setFilter(data.filter((item) => item.category === cat));
+//     }
+//   };
+
+//   const Loading = () =>
+//     [...Array(8)].map((_, index) => (
+//       <div key={index} className="col-md-3 mb-4">
+//         <Skeleton height={300} />
+//       </div>
+//     ));
+
+//   const ProductCard = ({ product }) => {
+//     const [currentImage, setCurrentImage] = useState(0);
+//     const originalPrice = product.price;
+//     const discountedPrice = Math.round(originalPrice - originalPrice * 0.1);
+
+//     return (
+//       <div className="col-6 col-md-4 col-lg-3 mb-4">
+//         <div className="card h-100 text-center shadow-sm">
+//           <Link to={`/product/${product.id}`}>
+//             <img
+//               src={product.images[currentImage]}
+//               alt={product.title}
+//               className="card-img-top"
+//               style={{ height: "220px", objectFit: "cover" }}
+//             />
+//           </Link>
+//           <div className="card-body">
+//             <h6 className="card-title">{product.title}</h6>
+//             <p>
+//               <del style={{ color: "red" }}>Rs.{originalPrice}</del>{" "}
+//               <strong>Rs.{discountedPrice}</strong>{" "}
+//               <span style={{ color: "green", fontSize: "12px" }}>(10% OFF)</span>
+//             </p>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   };
+
+//   return (
+//     <div className="container my-4">
+//       <div className="text-center mb-4">
+//         <h3>🛍️ Browse Our Products</h3>
+//         <div className="d-flex justify-content-center flex-wrap gap-2 mt-3">
+//           <button className="btn btn-outline-dark btn-sm" onClick={() => filterProduct("all")}>All</button>
+//           {categories.map((cat, index) => (
+//             <button
+//               key={index}
+//               className="btn btn-outline-dark btn-sm"
+//               onClick={() => filterProduct(cat)}
+//             >
+//               {cat}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+
+//       <div className="row">{loading ? <Loading /> : filter.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+
+//       <div className="text-center mt-4">
+//         <button className="btn btn-sm btn-outline-dark me-2" onClick={() => setPage((prev) => Math.max(1, prev - 1))} disabled={page === 1}>
+//           ◀ Prev
+//         </button>
+//         <span className="fw-bold">Page {page} of {totalPages}</span>
+//         <button className="btn btn-sm btn-outline-dark ms-2" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page === totalPages}>
+//           Next ▶
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Products;
+
+
+
+
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const Products = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  let componentMounted = true;
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  /**
-   * Add Product to Cart with Token Authentication
-   */
-  const addProductToCart = async (product) => {
-    const token = localStorage.getItem("apitoken");
-
-    if (!token) {
-      toast.error("You need to log in to add items to the cart!");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      const cartItem = {
-        items: [
-          {
-            id: product.id,
-            quantity: 1,
-            name: product.title,
-            price: product.price,
-            image: product.image,
-          },
-        ],
-      };
-
-      const response = await fetch(
-        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(cartItem),
-        }
-      );
-      console.log(response, "reposnefromapi");
-
-      if (!response.ok) {
-        throw new Error("Failed to add product to cart");
-      }
-
-      toast.success("Product added to cart successfully!");
-      dispatch(addCart(product));
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      toast.error("Failed to add product to cart.");
-    }
-  };
-
-  /**
-   * Fetch Products and Categories
-   */
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://hammerhead-app-jkdit.ondigitalocean.app/products?page=${page}&limit=16`
+          `http://localhost:5000/products?page=${page}&limit=16`
         );
         const result = await response.json();
 
-        const formattedData = result.rows.map((item) => ({
-          id: item.item_id,
-          title: item.name || "No Title",
-          price: item.price || 0,
-          description: item.description || "No description available",
-          category: item.category || "Uncategorized",
-          images:
-            item.images && item.images.length > 0
-              ? item.images
-              : ["https://via.placeholder.com/150"],
-          rating: {
-            rate: parseFloat(item.avg_rating) || 0,
-            count: item.rating_count || 0,
-          },
-        }));
+        const formattedData = result.rows.map((item) => {
+          let images = [];
+          try {
+            images =
+              typeof item.images === "string"
+                ? JSON.parse(item.images)
+                : item.images;
+          } catch (e) {
+            images = [];
+          }
+
+          return {
+            id: item.item_id,
+            title: item.name || "No Title",
+            price: item.price || 0,
+            description: item.description || "No description available",
+            category: item.category || "Uncategorized",
+            subcategory: item.subcategory || "",
+            images:
+              images.length > 0 ? images : ["https://via.placeholder.com/150"],
+          };
+        });
 
         const uniqueCategories = [
           ...new Set(formattedData.map((item) => item.category)),
@@ -115,9 +246,32 @@ const Products = () => {
     getProducts();
   }, [page]);
 
-  /**
-   * Handle Loading State
-   */
+  const filterProduct = (category) => {
+    setSelectedCategory(category);
+    setSelectedSubcategory("");
+    if (category === "all") {
+      setFilter(data);
+      setSubcategories([]);
+    } else {
+      const updated = data.filter((item) => item.category === category);
+      setFilter(updated);
+      const uniqueSubs = [
+        ...new Set(updated.map((item) => item.subcategory).filter(Boolean)),
+      ];
+      setSubcategories(uniqueSubs);
+    }
+  };
+
+  const filterBySubcategory = (subcategory) => {
+    setSelectedSubcategory(subcategory);
+    const updated = data.filter(
+      (item) =>
+        item.category === selectedCategory &&
+        item.subcategory === subcategory
+    );
+    setFilter(updated);
+  };
+
   const Loading = () => (
     <>
       <div className="col-12 py-5 text-center">
@@ -131,26 +285,13 @@ const Products = () => {
     </>
   );
 
-  /**
-   * Filter Products by Category
-   */
-  const filterProduct = (cat) => {
-    if (cat === "all") {
-      setFilter(data);
-    } else {
-      const updatedList = data.filter((item) => item.category === cat);
-      setFilter(updatedList);
-    }
-  };
-
-  /**
-   * Show Products
-   */
   const ShowProducts = () => (
     <>
-      <div className="buttons text-center py-5">
+      <div className="buttons text-center py-4">
         <button
-          className="btn btn-outline-dark btn-sm m-2"
+          className={`btn btn-sm m-1 ${
+            selectedCategory === "all" ? "btn-dark" : "btn-outline-dark"
+          }`}
           onClick={() => filterProduct("all")}
         >
           All
@@ -158,22 +299,41 @@ const Products = () => {
         {categories.map((cat, index) => (
           <button
             key={index}
-            className="btn btn-outline-dark btn-sm m-2"
+            className={`btn btn-sm m-1 ${
+              selectedCategory === cat ? "btn-dark" : "btn-outline-dark"
+            }`}
             onClick={() => filterProduct(cat)}
           >
-            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {cat}
           </button>
         ))}
       </div>
+
+      {/* ✅ Subcategories */}
+      {subcategories.length > 0 && (
+        <div className="text-center mb-3">
+          <h6>Subcategories:</h6>
+          {subcategories.map((sub, index) => (
+            <button
+              key={index}
+              className={`btn btn-sm m-1 ${
+                selectedSubcategory === sub ? "btn-success" : "btn-outline-success"
+              }`}
+              onClick={() => filterBySubcategory(sub)}
+            >
+              {sub}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="row g-0 gx-0 gy-0 p-0 m-0">
         {filter.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            addProductToCart={addProductToCart}
-          />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
+
+      {/* Pagination */}
       <div className="text-center my-4">
         <button
           className="btn btn-outline-dark btn-sm mx-2"
@@ -182,11 +342,9 @@ const Products = () => {
         >
           ◀ Previous
         </button>
-
         <span className="mx-2 fw-bold">
           Page {page} of {totalPages}
         </span>
-
         <button
           className="btn btn-outline-dark btn-sm mx-2"
           disabled={page === totalPages}
@@ -202,7 +360,7 @@ const Products = () => {
     <div className="container my-3 py-3">
       <div className="row">
         <div className="col-12">
-          <h2 className="display-5 text-center">Latest Products</h2>
+          <h2 className="display-5 text-center">🛍️ Explore Products</h2>
           <hr />
         </div>
       </div>
@@ -212,70 +370,6 @@ const Products = () => {
     </div>
   );
 };
-
-/**
- * Product Card with Clickable Image
- */
-// const ProductCard = ({ product, addProductToCart }) => {
-//   const [currentImage, setCurrentImage] = useState(0);
-
-//   // Calculate Discount Price (10% OFF) and round off to nearest integer
-//   const discountPercentage = 10; // Change this to any percentage
-//   const originalPrice = product.price;
-//   const discountedPrice = Math.round(
-//     originalPrice - (originalPrice * discountPercentage) / 100
-//   );
-
-//   const handleNextImage = () => {
-//     setCurrentImage((prev) => (prev + 1) % product.images.length);
-//   };
-
-//   const handlePrevImage = () => {
-//     setCurrentImage((prev) =>
-//       prev === 0 ? product.images.length - 1 : prev - 1
-//     );
-//   };
-
-//   return (
-//     <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.1rem" }}>
-//       <div className="card text-center h-100 shadow-sm m-0">
-//         <div className="position-relative">
-//           <Link to={`/product/${product.id}`}>
-//             <img
-//               className="card-img-top"
-//               src={product.images[currentImage]}
-//               alt={product.title}
-//               style={{
-//                 width: "100%",
-//                 height: "240px",
-//                 objectFit: "cover",
-//               }}
-//             />
-//           </Link>
-//         </div>
-
-//         <div className="card-body">
-//           <h5 className="card-title">{product.title}</h5>
-
-//           {/* ✅ Product Price with Discount Display */}
-//           <h6 className="lead">
-//             <del style={{ color: "red", marginRight: "5px" }}>
-//               Rs.{originalPrice}
-//             </del>
-//             <span style={{ fontWeight: "bold", color: "#000" }}>
-//               Rs.{discountedPrice}
-//             </span>
-//             <span
-//               style={{ color: "green", marginLeft: "5px", fontSize: "14px" }}
-//             >
-//               ({discountPercentage}% OFF)
-//             </span>
-//           </h6>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 const ProductCard = ({ product }) => {
   const [currentImage, setCurrentImage] = useState(0);
@@ -303,7 +397,6 @@ const ProductCard = ({ product }) => {
           />
         </Link>
 
-        {/* ✅ Thumbnail carousel below main image */}
         {product.images.length > 1 && (
           <div
             className="d-flex justify-content-center mt-2 px-2"
@@ -336,7 +429,6 @@ const ProductCard = ({ product }) => {
 
         <div className="card-body">
           <h6 className="card-title mb-2">{product.title}</h6>
-
           <h6 className="lead">
             <del style={{ color: "red", marginRight: "5px" }}>
               Rs.{originalPrice}
