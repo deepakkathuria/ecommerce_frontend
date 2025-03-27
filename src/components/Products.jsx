@@ -201,7 +201,7 @@ const Products = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:5000/products?page=${page}&limit=16`
+          `https://hammerhead-app-jkdit.ondigitalocean.app/products?page=${page}&limit=16`
         );
         const result = await response.json();
 
