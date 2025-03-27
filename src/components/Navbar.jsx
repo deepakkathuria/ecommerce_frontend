@@ -474,7 +474,7 @@ const Navbar = () => {
                   <ul className={`dropdown-menu dropdown-menu-end ${isDropdownOpen ? "show" : ""}`}>
                     <li><NavLink className="dropdown-item" to="/profile">My Profile</NavLink></li>
                     <li><NavLink className="dropdown-item" to="/profile/orders">My Orders</NavLink></li>
-                    <li><NavLink className="dropdown-item" to="/profile/wishlist">Wishlist</NavLink></li>
+                    {/* <li><NavLink className="dropdown-item" to="/profile/wishlist">Wishlist</NavLink></li> */}
                     <li><NavLink className="dropdown-item" to="/profile/settings">Settings</NavLink></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                   </ul>
