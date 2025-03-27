@@ -11,5 +11,8 @@ export { default as Profile } from './Profile';
 export { default as OrderDetails } from './OrderDetails'; // ✅ Added this line
 export { default as InvoicePage } from './InvoicePage'; // ✅ Added this line
 
+export { default as PrivacyPolicy } from './PrivacyPolicy'; // ✅ Added this line
+export { default as ReturnPolicy } from './ReturnPolicy'; // ✅ Added this line
+
 
 export { default as PageNotFound } from './PageNotFound';

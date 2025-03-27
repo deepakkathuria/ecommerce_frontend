@@ -29,8 +29,10 @@ const Footer = () => {
                 <NavLink to="/contact" className="text-light text-decoration-none">Contact</NavLink>
               </li>
               <li>
-                <NavLink to="/contact" className="text-light text-decoration-none">Privacy Policy</NavLink>
+                <NavLink to="/privacy-policy" className="text-light text-decoration-none">Privacy Policy</NavLink>
               </li>
+              <NavLink to="/return-policy" className="text-light text-decoration-none">Return Policy</NavLink>
+
             </ul>
           </div>
 

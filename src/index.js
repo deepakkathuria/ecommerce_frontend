@@ -19,7 +19,9 @@ import {
   Profile,
   OrderDetails,
   InvoicePage,
+  PrivacyPolicy,
   PageNotFound,
+  ReturnPolicy,
 } from "./pages";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
@@ -78,6 +80,9 @@ root.render(
           <Route path="/profile/orders/:orderId" element={<OrderDetails />} />
 
           <Route path="/invoice/:orderId" element={<InvoicePage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+          <Route path="/return-policy" element={<ReturnPolicy />} />
 
 
           {/* Catch-All Route */}
