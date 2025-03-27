@@ -409,7 +409,7 @@ const Navbar = () => {
 
           {/* Logo */}
           <NavLink className="navbar-brand fw-bold fs-4" to="/">
-            <img src="/assets/logo1.png" alt="Zairi Logo" width="110" height="40" />
+          <img src="/assets/logo1.png" alt="Zairi Logo" width="110" height="40" />
           </NavLink>
 
           {/* Center NavLinks (Desktop) */}

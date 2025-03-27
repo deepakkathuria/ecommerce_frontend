@@ -11,6 +11,9 @@ const Products = () => {
   const [filter, setFilter] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   let componentMounted = true;
 
   const dispatch = useDispatch();
@@ -21,7 +24,6 @@ const Products = () => {
    */
   const addProductToCart = async (product) => {
     const token = localStorage.getItem("apitoken");
-    console.log(token,"ttttttttttooooooooooooooooooooooookkkkkkkkkkkkkkk")
 
     if (!token) {
       toast.error("You need to log in to add items to the cart!");
@@ -53,7 +55,7 @@ const Products = () => {
           body: JSON.stringify(cartItem),
         }
       );
-      console.log(response,"reposnefromapi")
+      console.log(response, "reposnefromapi");
 
       if (!response.ok) {
         throw new Error("Failed to add product to cart");
@@ -75,50 +77,43 @@ const Products = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://hammerhead-app-jkdit.ondigitalocean.app/products"
+          `https://hammerhead-app-jkdit.ondigitalocean.app/products?page=${page}&limit=16`
         );
         const result = await response.json();
 
-        if (componentMounted) {
-          // Map API response to format
-          const formattedData = result.rows.map((item) => ({
-            id: item.item_id,
-            title: item.name || "No Title",
-            price: item.price || 0,
-            description: item.description || "No description available",
-            category: item.category || "Uncategorized",
-            images:
-              item.images && item.images.length > 0
-                ? item.images
-                : ["https://via.placeholder.com/150"], // Default placeholder
-            rating: {
-              rate: parseFloat(item.avg_rating) || 0,
-              count: item.rating_count || 0,
-            },
-          }));
+        const formattedData = result.rows.map((item) => ({
+          id: item.item_id,
+          title: item.name || "No Title",
+          price: item.price || 0,
+          description: item.description || "No description available",
+          category: item.category || "Uncategorized",
+          images:
+            item.images && item.images.length > 0
+              ? item.images
+              : ["https://via.placeholder.com/150"],
+          rating: {
+            rate: parseFloat(item.avg_rating) || 0,
+            count: item.rating_count || 0,
+          },
+        }));
 
-          // Extract unique categories
-          const uniqueCategories = [
-            ...new Set(formattedData.map((item) => item.category)),
-          ];
+        const uniqueCategories = [
+          ...new Set(formattedData.map((item) => item.category)),
+        ];
 
-          setData(formattedData);
-          setFilter(formattedData);
-          setCategories(uniqueCategories);
-          setLoading(false);
-        }
+        setData(formattedData);
+        setFilter(formattedData);
+        setCategories(uniqueCategories);
+        setTotalPages(result.totalPages);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
         setLoading(false);
       }
-
-      return () => {
-        componentMounted = false;
-      };
     };
 
     getProducts();
-  }, []);
+  }, [page]);
 
   /**
    * Handle Loading State
@@ -178,6 +173,27 @@ const Products = () => {
             addProductToCart={addProductToCart}
           />
         ))}
+      </div>
+      <div className="text-center my-4">
+        <button
+          className="btn btn-outline-dark btn-sm mx-2"
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+        >
+          ◀ Previous
+        </button>
+
+        <span className="mx-2 fw-bold">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          className="btn btn-outline-dark btn-sm mx-2"
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
+        >
+          Next ▶
+        </button>
       </div>
     </>
   );
@@ -261,7 +277,6 @@ const Products = () => {
 //   );
 // };
 
-
 const ProductCard = ({ product }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
@@ -340,7 +355,5 @@ const ProductCard = ({ product }) => {
     </div>
   );
 };
-
-
 
 export default Products;
