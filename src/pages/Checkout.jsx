@@ -115,7 +115,14 @@ const Checkout = () => {
           contact: phoneRef.current.value,
         },
         theme: { color: "#3399cc" },
+        method: {
+          upi: true,
+          card: false,
+          netbanking: false,
+          wallet: false,
+        },
       };
+      
 
       const rzp = new window.Razorpay(options);
       rzp.open();
