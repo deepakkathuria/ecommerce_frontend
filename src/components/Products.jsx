@@ -197,22 +197,28 @@ const Products = () => {
     const getProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `https://hammerhead-app-jkdit.ondigitalocean.app/products?page=${page}&limit=16`
-        );
+        const url = new URL("https://hammerhead-app-jkdit.ondigitalocean.app/products");
+        url.searchParams.append("page", page);
+        url.searchParams.append("limit", 16);
+  
+        if (selectedCategory !== "all") {
+          url.searchParams.append("category", selectedCategory);
+          if (selectedSubcategory) {
+            url.searchParams.append("subcategory", selectedSubcategory);
+          }
+        }
+  
+        const response = await fetch(url.toString());
         const result = await response.json();
-
+  
         const formattedData = result.rows.map((item) => {
           let images = [];
           try {
-            images =
-              typeof item.images === "string"
-                ? JSON.parse(item.images)
-                : item.images;
+            images = typeof item.images === "string" ? JSON.parse(item.images) : item.images;
           } catch (e) {
             images = [];
           }
-
+  
           return {
             id: item.item_id,
             title: item.name || "No Title",
@@ -220,28 +226,25 @@ const Products = () => {
             description: item.description || "No description available",
             category: item.category || "Uncategorized",
             subcategory: item.subcategory || "",
-            images:
-              images.length > 0 ? images : ["https://via.placeholder.com/150"],
+            images: images.length > 0 ? images : ["https://via.placeholder.com/150"],
           };
         });
-
-        const uniqueCategories = [
-          ...new Set(formattedData.map((item) => item.category)),
-        ];
-
+  
+        const uniqueCategories = [...new Set(formattedData.map(item => item.category))];
         setData(formattedData);
         setFilter(formattedData);
         setCategories(uniqueCategories);
         setTotalPages(result.totalPages);
-        setLoading(false);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("❌ Fetch error:", error);
+      } finally {
         setLoading(false);
       }
     };
-
+  
     getProducts();
-  }, [page]);
+  }, [page, selectedCategory, selectedSubcategory]);
+  
 
   const filterProduct = (category) => {
     setSelectedCategory(category);
