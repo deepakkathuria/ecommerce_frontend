@@ -46,7 +46,7 @@
 // //     <>
 // //     <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
 // //       <div className="container-fluid d-flex justify-content-between align-items-center px-3">
-        
+
 // //         {/* 🔹 Logo (Always Left) */}
 // //         <NavLink className="navbar-brand fw-bold fs-4" to="/">
 // //           <img src="/assets/logo1.png" alt="DK Ecommerce Logo" width="110" height="40" />
@@ -166,15 +166,11 @@
 // // </div>
 
 // //     </>
-    
-    
+
 // //   );
 // // };
 
 // // export default Navbar;
-
-
-
 
 // import React, { useState, useEffect } from "react";
 // import { NavLink, useNavigate } from "react-router-dom";
@@ -354,9 +350,6 @@
 
 // export default Navbar;
 
-
-
-
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -384,10 +377,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear", {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await fetch(
+        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/clear",
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       localStorage.removeItem("apitoken");
       dispatch(clearCart());
@@ -406,10 +402,14 @@ const Navbar = () => {
       {/* Navbar */}
       <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top shadow-sm">
         <div className="container-fluid d-flex justify-content-between align-items-center px-3">
-
           {/* Logo */}
           <NavLink className="navbar-brand fw-bold fs-4" to="/">
-          <img src="/assets/logo1.png" alt="Zairi Logo" width="110" height="40" />
+            <img
+              src="/assets/logo1.png"
+              alt="Zairi Logo"
+              width="110"
+              height="40"
+            />
           </NavLink>
 
           {/* Center NavLinks (Desktop) */}
@@ -424,7 +424,12 @@ const Navbar = () => {
                     borderBottom: isActive ? "2px solid #007bff" : "none",
                   })}
                 >
-                  {path === "/" ? "Home" : path.replace("/", "").replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  {path === "/"
+                    ? "Home"
+                    : path
+                        .replace("/", "")
+                        .replace("-", " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())}
                 </NavLink>
               </li>
             ))}
@@ -437,20 +442,32 @@ const Navbar = () => {
                 <NavLink to="/login" className="btn btn-dark btn-sm d-lg-none">
                   <i className="fa-solid fa-key"></i>
                 </NavLink>
-                <NavLink to="/register" className="btn btn-outline-dark btn-sm d-lg-none">
+                <NavLink
+                  to="/register"
+                  className="btn btn-outline-dark btn-sm d-lg-none"
+                >
                   <i className="fa-solid fa-user-plus"></i>
                 </NavLink>
 
-                <NavLink to="/login" className="btn btn-dark btn-sm d-none d-lg-inline">
+                <NavLink
+                  to="/login"
+                  className="btn btn-dark btn-sm d-none d-lg-inline"
+                >
                   <i className="fa-solid fa-key"></i> Login
                 </NavLink>
-                <NavLink to="/register" className="btn btn-outline-dark btn-sm d-none d-lg-inline">
+                <NavLink
+                  to="/register"
+                  className="btn btn-outline-dark btn-sm d-none d-lg-inline"
+                >
                   <i className="fa-solid fa-user-plus"></i> Register
                 </NavLink>
               </>
             ) : (
               <>
-                <NavLink to="/cart" className="btn btn-outline-dark btn-sm d-lg-none position-relative">
+                <NavLink
+                  to="/cart"
+                  className="btn btn-outline-dark btn-sm d-lg-none position-relative"
+                >
                   <i className="fa fa-shopping-cart"></i>
                   {state.length > 0 && (
                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -459,7 +476,10 @@ const Navbar = () => {
                   )}
                 </NavLink>
 
-                <NavLink to="/cart" className="btn btn-outline-dark btn-sm d-none d-lg-inline">
+                <NavLink
+                  to="/cart"
+                  className="btn btn-outline-dark btn-sm d-none d-lg-inline"
+                >
                   <i className="fa fa-shopping-cart"></i> Cart ({state.length})
                 </NavLink>
 
@@ -471,12 +491,32 @@ const Navbar = () => {
                   >
                     Profile
                   </button>
-                  <ul className={`dropdown-menu dropdown-menu-end ${isDropdownOpen ? "show" : ""}`}>
-                    <li><NavLink className="dropdown-item" to="/profile">My Profile</NavLink></li>
-                    <li><NavLink className="dropdown-item" to="/profile/orders">My Orders</NavLink></li>
+                  <ul
+                    className={`dropdown-menu dropdown-menu-end ${
+                      isDropdownOpen ? "show" : ""
+                    }`}
+                  >
+                    <li>
+                      <NavLink className="dropdown-item" to="/profile">
+                        My Profile
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink className="dropdown-item" to="/profile/orders">
+                        My Orders
+                      </NavLink>
+                    </li>
                     {/* <li><NavLink className="dropdown-item" to="/profile/wishlist">Wishlist</NavLink></li> */}
-                    <li><NavLink className="dropdown-item" to="/profile/settings">Settings</NavLink></li>
-                    <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
+                    <li>
+                      <NavLink className="dropdown-item" to="/profile/settings">
+                        Settings
+                      </NavLink>
+                    </li>
+                    <li>
+                      <button className="dropdown-item" onClick={handleLogout}>
+                        Logout
+                      </button>
+                    </li>
                   </ul>
                 </div>
               </>
@@ -506,13 +546,25 @@ const Navbar = () => {
                     className="nav-link fw-bold"
                     onClick={toggleMobileMenu}
                   >
-                    {path === "/" ? "Home" : path.replace("/", "").replace(/\b\w/g, (l) => l.toUpperCase())}
+                    {path === "/"
+                      ? "Home"
+                      : path
+                          .replace("/", "")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                   </NavLink>
                 </li>
               ))}
             </ul>
           </div>
         )}
+
+        {/* 🔔 Razorpay Notice (Global Banner) */}
+        <div
+          style={{
+            backgroundColor: "#fff3cd",
+            borderBottom: "1px solid #ffeeba",
+          }}
+        ></div>
       </nav>
 
       {/* Scrolling Banner */}
@@ -535,8 +587,9 @@ const Navbar = () => {
             animation: "scroll-text 15s linear infinite",
           }}
         >
-          🛍️ FREE DELIVERY ON ALL ORDERS – LIMITED TIME ONLY 🚚 &nbsp;&nbsp;&nbsp;&nbsp;
-          🎁 Exclusive Offers Every Week – Stay Tuned 💥 &nbsp;&nbsp;&nbsp;&nbsp;
+          🛍️ FREE DELIVERY ON ALL ORDERS – LIMITED TIME ONLY 🚚
+          &nbsp;&nbsp;&nbsp;&nbsp; 🎁 Exclusive Offers Every Week – Stay Tuned
+          💥 &nbsp;&nbsp;&nbsp;&nbsp;
         </div>
         <style>
           {`
@@ -547,6 +600,45 @@ const Navbar = () => {
           `}
         </style>
       </div>
+      {/* 🔒 Razorpay Alert Banner - Safe for Web & Mobile */}
+<div
+  style={{
+    width: "100vw",
+    overflowX: "hidden",
+    backgroundColor: "#fff3cd",
+    borderBottom: "1px solid #ffeeba",
+    padding: "10px 16px",
+    boxSizing: "border-box",
+    textAlign: "center",
+    fontSize: "14px",
+    fontFamily: "Poppins, sans-serif",
+    color: "#664d03",
+    zIndex: 9999,
+  }}
+>
+  <div
+    style={{
+      maxWidth: "1140px",
+      margin: "0 auto",
+      padding: "0 10px",
+    }}
+  >
+    <strong>🔒 Payments Update:</strong> Razorpay UPI is under review. Live soon! Till then, contact us on{" "}
+    <a
+      href="https://wa.me/91XXXXXXXXXX" // Replace with your WhatsApp number
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        textDecoration: "underline",
+        fontWeight: "bold",
+        color: "#000",
+      }}
+    >
+      WhatsApp 📱
+    </a>
+  </div>
+</div>
+
     </>
   );
 };
