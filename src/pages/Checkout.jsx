@@ -21,7 +21,7 @@ const Checkout = () => {
   const phoneRef = useRef();
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shipping = 30;
+  const shipping = 0;
   const total = subtotal + shipping;
 
   const handlePayment = async (e) => {
@@ -47,7 +47,7 @@ const Checkout = () => {
           const token = localStorage.getItem("apitoken");
 
           const verifyRes = await fetch(
-            "https://hammerhead-app-jkdit.ondigitalocean.app/verify-payment",
+            "http://localhost:5000/verify-payment",
             {
               method: "POST",
               headers: {
