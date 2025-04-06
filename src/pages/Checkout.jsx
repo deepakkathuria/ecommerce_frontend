@@ -47,7 +47,7 @@ const Checkout = () => {
           const token = localStorage.getItem("apitoken");
 
           const verifyRes = await fetch(
-            "https://hammerhead-app-jkdit.ondigitalocean.app/verify-payment",
+            "http://localhost:5000/verify-payment",
             {
               method: "POST",
               headers: {
