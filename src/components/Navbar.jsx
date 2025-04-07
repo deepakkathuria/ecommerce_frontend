@@ -584,24 +584,27 @@ const Navbar = () => {
           style={{
             display: "inline-block",
             paddingLeft: "100%",
-            animation: "scroll-text 15s linear infinite",
+            animation: "scroll-text 20s linear infinite",
           }}
         >
           🛍️ FREE DELIVERY ON ALL ORDERS – LIMITED TIME ONLY 🚚
-          &nbsp;&nbsp;&nbsp;&nbsp; 🎁 Exclusive Offers Every Week – Stay Tuned
-          💥 &nbsp;&nbsp;&nbsp;&nbsp;
+          {/* &nbsp;&nbsp;&nbsp;&nbsp; 🎁 Exclusive Offers Every Week – Stay Tuned */}
+          💥 &nbsp;&nbsp;&nbsp;&nbsp; 📸 ₹80 OFF on every product –
+          #SelfieWithPoster Challenge is LIVE! Check Insta Now! 🔥
+          &nbsp;&nbsp;&nbsp;&nbsp;
         </div>
         <style>
           {`
-            @keyframes scroll-text {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-100%); }
-            }
-          `}
+      @keyframes scroll-text {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+      }
+    `}
         </style>
       </div>
+
       {/* 🔒 Razorpay Alert Banner - Safe for Web & Mobile */}
-<div
+      {/* <div
   style={{
     width: "100vw",
     overflowX: "hidden",
@@ -637,8 +640,81 @@ const Navbar = () => {
       WhatsApp 📱
     </a>
   </div>
-</div>
+</div> */}
 
+      <div
+        style={{
+          width: "100vw",
+          overflowX: "hidden",
+          backgroundColor: "#fff3cd",
+          borderBottom: "1px solid #ffeeba",
+          padding: "10px 16px 4px",
+          boxSizing: "border-box",
+          textAlign: "center",
+          fontSize: "14px",
+          fontFamily: "Poppins, sans-serif",
+          color: "#664d03",
+          zIndex: 9999,
+        }}
+      >
+        <div
+          style={{ maxWidth: "1140px", margin: "0 auto", padding: "0 10px" }}
+        >
+          <strong>Need Help?</strong> If you face any difficulty while buying
+          from the website, feel free to ping us on{" "}
+          <a
+            href="https://wa.me/8447145941"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontWeight: "bold",
+              color: "#000",
+              textDecoration: "underline",
+            }}
+          >
+            WhatsApp
+          </a>{" "}
+          or{" "}
+          <a
+            href="https://www.instagram.com/zairi.in?igsh=MTJ0MXU4M3hvNzMzNQ%3D%3D"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontWeight: "bold",
+              color: "#000",
+              textDecoration: "underline",
+            }}
+          >
+            Instagram
+          </a>
+        </div>
+      </div>
+      {/* <div
+        style={{
+          backgroundColor: "#e0f7fa",
+          color: "#004d40",
+          textAlign: "center",
+          fontSize: "15px",
+          padding: "8px 16px",
+          fontFamily: "Poppins, sans-serif",
+        }}
+      >
+        📸 <strong>#SelfieWithPoster</strong> Challenge is LIVE! Take a selfie
+        with our poster & get ₹80 OFF.
+        <a
+          href="https://www.instagram.com/yourbrandusername" // change to your actual Insta handle
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            marginLeft: "6px",
+            fontWeight: "bold",
+            color: "#00796b",
+            textDecoration: "underline",
+          }}
+        >
+          Check Instagram →
+        </a>
+      </div> */}
     </>
   );
 };
