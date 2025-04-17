@@ -796,7 +796,11 @@ const Checkout = () => {
                 <PromoInput
                   subtotal={subtotal}
                   setDiscount={setDiscount}
-                  setPromoApplied={setPromoApplied}
+                  setTotal={() => {}} // optional if you're using only `discount`
+
+                  // setPromoApplied={setPromoApplied}
+                  // setTotal={(val) => setDiscount(subtotal - val)} // ❌ wrong
+
                 />
               </div>
             </div>
