@@ -592,9 +592,9 @@ const Navbar = () => {
           💥 &nbsp;&nbsp;&nbsp;&nbsp; 
           {/* 📸 ₹80 OFF on every product –
           #SelfieWithPoster Challenge is LIVE! Check Insta Now! 🔥 */}
-          📣 Good Friday Sale is LIVE! 🕊️  
+          {/* 📣 Good Friday Sale is LIVE! 🕊️  
           Use code <strong>GDFRI</strong> to get 10% OFF on your bill! 🔥
-          &nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp; */}
         </div>
         <style>
           {`
