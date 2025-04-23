@@ -175,28 +175,20 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://hammerhead-app-jkdit.ondigitalocean.app/auth/signin",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      if (!response.ok) throw new Error(data.message || "Login failed");
 
       localStorage.setItem("apitoken", data.token);
 
-      const cartResponse = await fetch(
-        "https://hammerhead-app-jkdit.ondigitalocean.app/cart",
-        {
-          headers: { Authorization: `Bearer ${data.token}` },
-        }
-      );
+      const cartResponse = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
 
       const cartData = await cartResponse.json();
       dispatch(syncCart(cartData.cartItems || []));
@@ -209,28 +201,23 @@ const Login = () => {
   };
 
   useEffect(() => {
+    /* Global callback */
     window.handleGoogleLogin = async (response) => {
       try {
-        const res = await fetch(
-          "https://hammerhead-app-jkdit.ondigitalocean.app/auth/google-login",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: response.credential }),
-          }
-        );
+        const res = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/auth/google-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: response.credential }),
+        });
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Google login failed");
 
         localStorage.setItem("apitoken", data.token);
 
-        const cartRes = await fetch(
-          "https://hammerhead-app-jkdit.ondigitalocean.app/cart",
-          {
-            headers: { Authorization: `Bearer ${data.token}` },
-          }
-        );
+        const cartRes = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+          headers: { Authorization: `Bearer ${data.token}` },
+        });
 
         const cartData = await cartRes.json();
         dispatch(syncCart(cartData.cartItems || []));
@@ -241,11 +228,10 @@ const Login = () => {
       }
     };
 
-    // 👇 Render Google Sign-In manually
+    /* Render Google Sign-In Button */
     if (window.google && window.google.accounts && window.google.accounts.id) {
       window.google.accounts.id.initialize({
-        client_id:
-          "1045579484974-41hm64lraj3gt4i9shuclcdqcbgmllvk.apps.googleusercontent.com",
+        client_id: "1045579484974-41hm64lraj3gt4i9shuclcdqcbgmllvk.apps.googleusercontent.com",
         callback: window.handleGoogleLogin,
       });
 
@@ -254,9 +240,8 @@ const Login = () => {
         {
           theme: "outline",
           size: "large",
-          text: "signin_with",
           shape: "rectangular",
-          logo_alignment: "left",
+          text: "signin_with",
         }
       );
     }
@@ -299,20 +284,13 @@ const Login = () => {
               <div className="my-3">
                 <p>
                   New Here?{" "}
-                  <Link
-                    to="/register"
-                    className="text-decoration-underline text-info"
-                  >
+                  <Link to="/register" className="text-decoration-underline text-info">
                     Register
                   </Link>
                 </p>
               </div>
               <div className="text-center">
-                <button
-                  className="my-2 mx-auto btn btn-dark"
-                  type="submit"
-                  disabled={loading}
-                >
+                <button className="my-2 mx-auto btn btn-dark" type="submit" disabled={loading}>
                   {loading ? "Logging in..." : "Login"}
                 </button>
               </div>
@@ -331,3 +309,5 @@ const Login = () => {
 };
 
 export default Login;
+
+
