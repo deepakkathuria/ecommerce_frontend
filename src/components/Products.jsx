@@ -201,14 +201,82 @@ const Products = () => {
   );
 };
 
+// const ProductCard = ({ product }) => {
+//   const [currentImage, setCurrentImage] = useState(0);
+
+//   // const discountPercentage = 10;
+//   const originalPrice = product.price;
+//   // const discountedPrice = Math.round(
+//   //   originalPrice - (originalPrice * discountPercentage) / 100
+//   // );
+
+//   return (
+//     <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.4rem" }}>
+//       <div className="card text-center h-100 shadow-sm m-0">
+//         <Link to={`/product/${product.id}`}>
+//           <img
+//             className="card-img-top"
+//             src={product.images[currentImage]}
+//             alt={product.title}
+//             style={{
+//               width: "100%",
+//               height: "240px",
+//               objectFit: "cover",
+//               borderRadius: "5px",
+//             }}
+//           />
+//         </Link>
+
+//         {product.images.length > 1 && (
+//           <div
+//             className="d-flex justify-content-center mt-2 px-2"
+//             style={{ overflowX: "auto" }}
+//           >
+//             {product.images.map((img, index) => (
+//               <img
+//                 key={index}
+//                 src={img}
+//                 alt={`Thumbnail ${index}`}
+//                 className={`img-thumbnail mx-1 ${
+//                   index === currentImage ? "border-primary" : ""
+//                 }`}
+//                 style={{
+//                   width: "40px",
+//                   height: "40px",
+//                   objectFit: "cover",
+//                   cursor: "pointer",
+//                   borderRadius: "4px",
+//                   border:
+//                     index === currentImage
+//                       ? "2px solid #007bff"
+//                       : "1px solid #ddd",
+//                 }}
+//                 onClick={() => setCurrentImage(index)}
+//               />
+//             ))}
+//           </div>
+//         )}
+
+//         <div className="card-body">
+//           <h6 className="card-title mb-2">{product.title}</h6>
+
+//           <h6 className="lead">
+//             <span style={{ fontWeight: "bold", color: "#000" }}>
+//               Rs.{originalPrice}
+//             </span>
+//           </h6>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
 const ProductCard = ({ product }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
-  // const discountPercentage = 10;
-  const originalPrice = product.price;
-  // const discountedPrice = Math.round(
-  //   originalPrice - (originalPrice * discountPercentage) / 100
-  // );
+  // Optimization helper
+  const optimizeImage = (url) => url?.replace("/upload/", "/upload/f_auto,q_auto,w_600/");
 
   return (
     <div className="col-6 col-md-4 col-lg-3" style={{ padding: "0.4rem" }}>
@@ -216,7 +284,8 @@ const ProductCard = ({ product }) => {
         <Link to={`/product/${product.id}`}>
           <img
             className="card-img-top"
-            src={product.images[currentImage]}
+            loading="lazy"
+            src={optimizeImage(product.images[currentImage])}
             alt={product.title}
             style={{
               width: "100%",
@@ -228,28 +297,21 @@ const ProductCard = ({ product }) => {
         </Link>
 
         {product.images.length > 1 && (
-          <div
-            className="d-flex justify-content-center mt-2 px-2"
-            style={{ overflowX: "auto" }}
-          >
+          <div className="d-flex justify-content-center mt-2 px-2" style={{ overflowX: "auto" }}>
             {product.images.map((img, index) => (
               <img
                 key={index}
-                src={img}
-                alt={`Thumbnail ${index}`}
-                className={`img-thumbnail mx-1 ${
-                  index === currentImage ? "border-primary" : ""
-                }`}
+                src={optimizeImage(img)}
+                alt={`Thumb ${index}`}
+                loading="lazy"
+                className={`img-thumbnail mx-1 ${index === currentImage ? "border-primary" : ""}`}
                 style={{
                   width: "40px",
                   height: "40px",
                   objectFit: "cover",
                   cursor: "pointer",
                   borderRadius: "4px",
-                  border:
-                    index === currentImage
-                      ? "2px solid #007bff"
-                      : "1px solid #ddd",
+                  border: index === currentImage ? "2px solid #007bff" : "1px solid #ddd",
                 }}
                 onClick={() => setCurrentImage(index)}
               />
@@ -259,18 +321,14 @@ const ProductCard = ({ product }) => {
 
         <div className="card-body">
           <h6 className="card-title mb-2">{product.title}</h6>
-
           <h6 className="lead">
-            <span style={{ fontWeight: "bold", color: "#000" }}>
-              Rs.{originalPrice}
-            </span>
+            <strong style={{ color: "#000" }}>Rs.{product.price}</strong>
           </h6>
         </div>
       </div>
     </div>
   );
 };
-
 
 
 

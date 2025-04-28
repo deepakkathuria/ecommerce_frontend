@@ -523,7 +523,11 @@ const Product = () => {
           <div className="col-md-6 col-sm-12 py-3">
             <img
               className="img-fluid"
-              src={selectedImage}
+              loading="lazy"
+              src={selectedImage?.replace(
+                "/upload/",
+                "/upload/f_auto,q_auto,w_800/"
+              )}
               alt={product.title}
               width="100%"
               height="auto"
