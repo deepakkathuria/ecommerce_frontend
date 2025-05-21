@@ -22,7 +22,9 @@ const Checkout = () => {
   const [promoApplied, setPromoApplied] = useState(false);
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shipping = 0;
+  // const shipping = 0;
+  const shipping = subtotal > 1000 ? 0 : 49;
+
   const total = subtotal - discount + shipping;
 
   useEffect(() => {

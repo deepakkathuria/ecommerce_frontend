@@ -587,9 +587,9 @@ const Navbar = () => {
             animation: "scroll-text 20s linear infinite",
           }}
         >
-          🛍️ FREE DELIVERY ON ALL ORDERS – LIMITED TIME ONLY 🚚
+          🛍️ FREE DELIVERY ON ORDERS OVER ₹1000 – LIMITED TIME ONLY! 🚚{" "}
           {/* &nbsp;&nbsp;&nbsp;&nbsp; 🎁 Exclusive Offers Every Week – Stay Tuned */}
-          💥 &nbsp;&nbsp;&nbsp;&nbsp; 
+          💥 &nbsp;&nbsp;&nbsp;&nbsp;
           {/* 📸 ₹80 OFF on every product –
           #SelfieWithPoster Challenge is LIVE! Check Insta Now! 🔥 */}
           {/* 📣 Good Friday Sale is LIVE! 🕊️  
