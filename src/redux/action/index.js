@@ -5,9 +5,18 @@ export const addCart = (product) => async (dispatch, getState) => {
       const state = getState().handleCart;
   
       // Check if product exists in cart and update backend
-      const updatedCart = state.map((item) =>
-        item.id === product.id ? { ...item, qty: (item.qty || 0) + 1 } : item
-      );
+      const existingItem = state.find(item => item.id === product.id);
+      let updatedCart;
+      
+      if (existingItem) {
+        // Update quantity for existing item
+        updatedCart = state.map((item) =>
+          item.id === product.id ? { ...item, qty: (item.qty || 1) + 1 } : item
+        );
+      } else {
+        // Add new item
+        updatedCart = [...state, { ...product, qty: 1 }];
+      }
   
       // Sync with backend
       await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
@@ -29,14 +38,35 @@ export const addCart = (product) => async (dispatch, getState) => {
   export const delCart = (product) => async (dispatch, getState) => {
     try {
       const token = localStorage.getItem("apitoken");
+      const state = getState().handleCart;
   
-      // Update backend
-      await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/cart/remove/${product.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Find the item to check its quantity
+      const existingItem = state.find(item => item.id === product.id);
+      
+      if (existingItem && existingItem.qty > 1) {
+        // Decrease quantity
+        const updatedCart = state.map((item) =>
+          item.id === product.id ? { ...item, qty: item.qty - 1 } : item
+        );
+        
+        // Update backend with new cart state
+        await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ items: updatedCart }),
+        });
+      } else {
+        // Remove item completely
+        await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/cart/remove/${product.id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
   
       dispatch({ type: "DELITEM", payload: product });
     } catch (err) {

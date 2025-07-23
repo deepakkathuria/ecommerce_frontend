@@ -1,17 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Footer, Navbar } from "../components";
 import { useSelector, useDispatch } from "react-redux";
-import { addCart, delCart } from "../redux/action";
+import { addCart, delCart, clearCart } from "../redux/action";
 import { Link } from "react-router-dom";
 import { syncCart } from "../redux/action";
-
+import toast from "react-hot-toast";
 
 const Cart = () => {
   const state = useSelector((state) => state.handleCart);
-
-  console.log(state,"statedata")
   const dispatch = useDispatch();
-
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -34,171 +32,297 @@ const Cart = () => {
     fetchCart();
   }, [dispatch]);
 
+  const addItem = async (product) => {
+    setIsUpdating(true);
+    try {
+      await dispatch(addCart(product));
+      toast.success("Item added to cart!");
+    } catch (error) {
+      toast.error("Failed to add item");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const removeItem = async (product) => {
+    setIsUpdating(true);
+    try {
+      await dispatch(delCart(product));
+      toast.success("Item removed from cart!");
+    } catch (error) {
+      toast.error("Failed to remove item");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const EmptyCart = () => {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12 py-5 bg-light text-center">
-            <h4 className="p-3 display-5">Your Cart is Empty</h4>
-            <Link to="/" className="btn  btn-outline-dark mx-4">
-              <i className="fa fa-arrow-left"></i> Continue Shopping
-            </Link>
+      <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-md-8 col-lg-6 text-center">
+            <div className="empty-cart-container">
+              <div className="empty-cart-icon mb-4">
+                <i className="fa fa-shopping-cart fa-4x text-muted"></i>
+              </div>
+              <h3 className="mb-3">Your Cart is Empty</h3>
+              <p className="text-muted mb-4">
+                Looks like you haven't added any items to your cart yet. 
+                Start shopping to discover amazing products!
+              </p>
+              <Link to="/product" className="btn btn-primary btn-lg">
+                <i className="fa fa-shopping-bag me-2"></i>
+                Start Shopping
+              </Link>
+            </div>
           </div>
         </div>
       </div>
     );
   };
 
-  const addItem = (product) => {
-    dispatch(addCart(product));
-  };
-  const removeItem = (product) => {
-    dispatch(delCart(product));
-  };
+  const CartItem = ({ item }) => {
+    const [quantity, setQuantity] = useState(item.qty || 1);
 
-  const ShowCart = () => {
-    let subtotal = 0;
-    // let shipping = 0;
+    const updateQuantity = async (newQty) => {
+      if (newQty < 1) return;
+      
+      setQuantity(newQty);
+      const updatedProduct = { ...item, qty: newQty };
+      
+      if (newQty > (item.qty || 1)) {
+        await addItem(updatedProduct);
+      } else if (newQty < (item.qty || 1)) {
+        await removeItem(updatedProduct);
+      }
+    };
 
-    let shipping = subtotal > 1000 ? 0 : 49;
-
-    let totalItems = 0;
-    state.map((item) => {
-      return (subtotal += item.price * item.qty);
-    });
-
-    state.map((item) => {
-      return (totalItems += item.qty);
-    });
     return (
-      <>
-        <section className="h-100 gradient-custom">
-          <div className="container py-5">
-            <div className="row d-flex justify-content-center my-4">
-              <div className="col-md-8">
-                <div className="card mb-4">
-                  <div className="card-header py-3">
-                    <h5 className="mb-0">Item List</h5>
-                  </div>
-                  <div className="card-body">
-                    {state.map((item) => {
-                      return (
-                        <div key={item.id}>
-                          <div className="row d-flex align-items-center">
-                            <div className="col-lg-3 col-md-12">
-                              <div
-                                className="bg-image rounded"
-                                data-mdb-ripple-color="light"
-                              >
-                                <img
-                                  src={item.image}
-                                  // className="w-100"
-                                  alt={item.title}
-                                  width={100}
-                                  height={75}
-                                />
-                              </div>
-                            </div>
-
-                            <div className="col-lg-5 col-md-6">
-                              <p>
-                                <strong>{item.title}</strong>
-                              </p>
-                              {/* <p>Color: blue</p>
-                              <p>Size: M</p> */}
-                            </div>
-
-                            <div className="col-lg-4 col-md-6">
-                              <div
-                                className="d-flex mb-4"
-                                style={{ maxWidth: "300px" }}
-                              >
-                                <button
-                                  className="btn px-3"
-                                  onClick={() => {
-                                    removeItem(item);
-                                  }}
-                                >
-                                  <i className="fas fa-minus"></i>
-                                </button>
-
-                                <p className="mx-5">{item.qty}</p>
-
-                                <button
-                                  className="btn px-3"
-                                  onClick={() => {
-                                    addItem(item);
-                                  }}
-                                >
-                                  <i className="fas fa-plus"></i>
-                                </button>
-                              </div>
-
-                              <p className="text-start text-md-center">
-                                <strong>
-                                  <span className="text-muted">{item.qty}</span>{" "}
-                                  x Rs.{item.price}
-                                </strong>
-                              </p>
-                            </div>
-                          </div>
-
-                          <hr className="my-4" />
-                        </div>
-                      );
-                    })}
+      <div className="card mb-3 shadow-sm">
+        <div className="row g-0">
+          <div className="col-md-3 col-4">
+            <div className="cart-item-image">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="img-fluid rounded-start h-100 w-100"
+                style={{ objectFit: "cover", minHeight: "150px" }}
+              />
+            </div>
+          </div>
+          <div className="col-md-9 col-8">
+            <div className="card-body">
+              <div className="row align-items-center">
+                <div className="col-md-6">
+                  <h6 className="card-title mb-2">{item.title}</h6>
+                  <p className="text-muted small mb-2">
+                    Category: {item.category || item.categoryName || "General"}
+                  </p>
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="quantity-controls">
+                      <button
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() => updateQuantity(quantity - 1)}
+                        disabled={isUpdating}
+                      >
+                        <i className="fa fa-minus"></i>
+                      </button>
+                      <span className="mx-3 fw-bold">{quantity}</span>
+                      <button
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() => updateQuantity(quantity + 1)}
+                        disabled={isUpdating}
+                      >
+                        <i className="fa fa-plus"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="col-md-4">
-                <div className="card mb-4">
-                  <div className="card-header py-3 bg-light">
-                    <h5 className="mb-0">Order Summary</h5>
-                  </div>
-                  <div className="card-body">
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                        Products ({totalItems})<span>Rs.{Math.round(subtotal)}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center px-0">
-                        Shipping
-                        <span>Rs.{shipping}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
-                        <div>
-                          <strong>Total amount</strong>
-                        </div>
-                        <span>
-                          <strong>Rs.{Math.round(subtotal + shipping)}</strong>
-                        </span>
-                      </li>
-                    </ul>
-
-                    <Link
-                      to="/checkout"
-                      className="btn btn-dark btn-lg btn-block"
-                    >
-                      Go to checkout
-                    </Link>
-                  </div>
+                <div className="col-md-3 text-center">
+                  <h6 className="text-primary mb-0">₹{item.price}</h6>
+                  <small className="text-muted">per item</small>
+                </div>
+                <div className="col-md-2 text-center">
+                  <h6 className="text-success mb-0">₹{item.price * quantity}</h6>
+                  <small className="text-muted">total</small>
+                </div>
+                <div className="col-md-1 text-end">
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => removeItem(item)}
+                    disabled={isUpdating}
+                    title="Remove item"
+                  >
+                    <i className="fa fa-trash"></i>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </>
+        </div>
+      </div>
+    );
+  };
+
+  const ShowCart = () => {
+    const subtotal = state.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0);
+    const shipping = subtotal >= 1000 ? 0 : 49;
+    const total = subtotal + shipping;
+    const totalItems = state.reduce((acc, item) => acc + (item.qty || 1), 0);
+    const remainingForFreeShipping = Math.max(0, 1000 - subtotal);
+
+    return (
+      <div className="container py-4">
+        <div className="row">
+          {/* Cart Items */}
+          <div className="col-lg-8">
+            <div className="card shadow-sm">
+              <div className="card-header bg-primary text-white">
+                <h5 className="mb-0">
+                  <i className="fa fa-shopping-cart me-2"></i>
+                  Shopping Cart ({totalItems} items)
+                </h5>
+              </div>
+              <div className="card-body">
+                {state.map((item) => (
+                  <CartItem key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div className="col-lg-4">
+            <div className="card shadow-sm sticky-top" style={{ top: "100px" }}>
+              <div className="card-header bg-light">
+                <h6 className="mb-0">Order Summary</h6>
+              </div>
+              <div className="card-body">
+                <div className="d-flex justify-content-between mb-2">
+                  <span>Subtotal ({totalItems} items):</span>
+                  <span className="fw-bold">₹{subtotal}</span>
+                </div>
+                <div className="d-flex justify-content-between mb-2">
+                  <span>Shipping:</span>
+                  <span className={shipping === 0 ? "text-success fw-bold" : ""}>
+                    {shipping === 0 ? "FREE" : `₹${shipping}`}
+                  </span>
+                </div>
+                <hr />
+                <div className="d-flex justify-content-between mb-3">
+                  <span className="fw-bold">Total:</span>
+                  <span className="fw-bold text-primary fs-5">₹{total}</span>
+                </div>
+
+                {/* Promo Code */}
+                <div className="mb-3">
+                  <div className="input-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Promo code"
+                    />
+                    <button className="btn btn-outline-primary" type="button">
+                      Apply
+                    </button>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="d-grid gap-2">
+                  <Link
+                    to="/checkout"
+                    className="btn btn-primary btn-lg"
+                    disabled={state.length === 0}
+                  >
+                    <i className="fa fa-credit-card me-2"></i>
+                    Proceed to Checkout
+                  </Link>
+                  <Link to="/product" className="btn btn-outline-primary">
+                    <i className="fa fa-arrow-left me-2"></i>
+                    Continue Shopping
+                  </Link>
+                  <button
+                    className="btn btn-outline-danger"
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to clear your cart?")) {
+                        dispatch(clearCart());
+                        toast.success("Cart cleared!");
+                      }
+                    }}
+                    disabled={state.length === 0}
+                  >
+                    <i className="fa fa-trash me-2"></i>
+                    Clear Cart
+                  </button>
+                </div>
+
+                {/* Shipping Info */}
+                <div className="mt-3 p-3 bg-light rounded">
+                  <h6 className="mb-2">
+                    <i className="fa fa-truck text-primary me-2"></i>
+                    Shipping Information
+                  </h6>
+                  <small className="text-muted">
+                    {shipping === 0 
+                      ? "🎉 Free shipping on orders above ₹1000" 
+                      : `Add ₹${remainingForFreeShipping} more for free shipping`
+                    }
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   };
 
   return (
     <>
       <Navbar />
-      <div className="container my-3 py-3">
-        <h1 className="text-center">Cart</h1>
-        <hr />
-        {state.length > 0 ? <ShowCart /> : <EmptyCart />}
-      </div>
+      {state.length === 0 ? <EmptyCart /> : <ShowCart />}
       <Footer />
+
+      <style>{`
+        .empty-cart-container {
+          padding: 3rem 0;
+        }
+
+        .empty-cart-icon {
+          opacity: 0.5;
+        }
+
+        .quantity-controls {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .cart-item-image {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .cart-item-image img {
+          transition: transform 0.3s ease;
+        }
+
+        .cart-item-image:hover img {
+          transform: scale(1.05);
+        }
+
+        .sticky-top {
+          z-index: 1020;
+        }
+
+        @media (max-width: 768px) {
+          .sticky-top {
+            position: relative !important;
+            top: 0 !important;
+          }
+        }
+      `}</style>
     </>
   );
 };
