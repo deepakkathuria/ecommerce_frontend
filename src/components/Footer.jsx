@@ -1,152 +1,269 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { blogHighlights } from "../data/blogHighlights";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-dark text-white">
-      {/* Main Footer Content */}
+    <footer className="hm-footer">
       <div className="container py-5">
-        <div className="row g-4">
-          {/* Company Info - Zairi (Left Aligned) */}
-          <div className="col-lg-4 col-md-6">
-            <div className="text-start">
-              <h4 className="fw-bold mb-3 text-white">Zairi</h4>
-              <p className="text-light mb-3">
-                Your one-stop shop for the best products.
-              </p>
-            </div>
-          </div>
-
-          {/* Quick Links (Center Aligned) */}
-          <div className="col-lg-4 col-md-6">
-            <div className="text-center">
-              <h6 className="fw-bold mb-3 text-white">Quick Links</h6>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <NavLink to="/" className="text-light text-decoration-none">
-                    Home
-                  </NavLink>
-                </li>
-                <li className="mb-2">
-                  <NavLink to="/product" className="text-light text-decoration-none">
-                    Products
-                  </NavLink>
-                </li>
-                <li className="mb-2">
-                  <NavLink to="/about" className="text-light text-decoration-none">
-                    About Us
-                  </NavLink>
-                </li>
-                <li className="mb-2">
-                  <NavLink to="/contact" className="text-light text-decoration-none">
-                    Contact
-                  </NavLink>
-                </li>
-                <li className="mb-2">
-                  <NavLink to="/privacy-policy" className="text-light text-decoration-none">
-                    Privacy Policy
-                  </NavLink>
-                </li>
-                <li className="mb-2">
-                  <NavLink to="/return-policy" className="text-light text-decoration-none">
-                    Return Policy
-                  </NavLink>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Follow Us (Right Aligned) */}
-          <div className="col-lg-4 col-md-6">
-            <div className="text-end">
-              <h6 className="fw-bold mb-3 text-white">Follow Us</h6>
-              <div className="d-flex justify-content-end">
-                <a 
-                  href="#" 
-                  className="text-white text-decoration-none instagram-icon"
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    border: '2px solid white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  <i className="fa fa-instagram fa-lg"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright */}
-      <div className="border-top border-secondary">
-        <div className="container py-3">
-          <div className="text-center">
-            <p className="text-light mb-0">
-              © {currentYear} Zairi. All rights reserved.
+        <div className="footer-grid">
+          {/* Brand */}
+          <div>
+            <h4 className="footer-logo">ZAIRI</h4>
+            <p className="footer-text">
+              Contemporary jewellery and accessories curated for every story.
             </p>
+            <div className="footer-blog-section">
+              <p className="footer-heading mb-2">From the Journal</p>
+              <div className="footer-blog-list">
+                {blogHighlights.map((post) => (
+                  <NavLink key={post.id} to={post.slug} className="footer-blog-item">
+                    <span className="footer-blog-date">{post.date}</span>
+                    <h5>{post.title}</h5>
+                    <p>{post.excerpt}</p>
+                  </NavLink>
+                ))}
+              </div>
+              <NavLink to="/blog" className="footer-blog-cta">
+                Read all articles →
+              </NavLink>
+            </div>
+          </div>
+
+          {/* Shop */}
+          <div>
+            <p className="footer-heading">Shop</p>
+            <ul className="footer-links">
+              <li><NavLink to="/product?category=jewellery">Jewellery</NavLink></li>
+              <li><NavLink to="/product?category=combo">Combos</NavLink></li>
+              <li><NavLink to="/product?category=accessories">Accessories</NavLink></li>
+              <li><NavLink to="/product">New Arrivals</NavLink></li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <p className="footer-heading">Company</p>
+            <ul className="footer-links">
+              <li><NavLink to="/about">About Zairi</NavLink></li>
+              <li><NavLink to="/contact">Contact</NavLink></li>
+              <li><NavLink to="/privacy-policy">Privacy</NavLink></li>
+              <li><NavLink to="/return-policy">Returns</NavLink></li>
+            </ul>
+          </div>
+
+          {/* Assistance */}
+          <div>
+            <p className="footer-heading">Need Help?</p>
+            <ul className="footer-links">
+              <li><a href="mailto:enquiryzairi@gmail.com">enquiryzairi@gmail.com</a></li>
+              <li><a href="tel:+918447145941">+91 84471 45941</a></li>
+              <li>Support hours: 10AM - 7PM IST</li>
+              <li>Live chat available every day</li>
+            </ul>
+            <div className="footer-socials">
+              <a href="https://www.instagram.com" target="_blank" rel="noreferrer"><i className="fa fa-instagram"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span>© {currentYear} Zairi. Crafted with love in India.</span>
+          <div className="footer-bottom-links">
+            <NavLink to="/privacy-policy">Privacy</NavLink>
+            <NavLink to="/return-policy">Returns</NavLink>
+            <NavLink to="/contact">Support</NavLink>
           </div>
         </div>
       </div>
 
-      {/* WhatsApp Floating Button */}
+      {/* Chat Floating Button */}
       <a
         href="https://wa.me/918447145941"
         target="_blank"
         rel="noopener noreferrer"
-        className="btn btn-success position-fixed"
-        style={{
-          bottom: "20px",
-          right: "20px",
-          zIndex: 1000,
-          borderRadius: "50%",
-          width: "60px",
-          height: "60px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-        }}
+        className="chat-float-button"
       >
-        <i className="fa fa-whatsapp fa-lg"></i>
+        Chat
       </a>
 
       <style>{`
-        footer {
-          background-color: #343a40 !important;
+        .hm-footer {
+          background: #f7f7f7;
+          color: #111;
         }
-        
-        footer a:hover {
-          color: #fff !important;
+
+        .footer-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 40px;
+        }
+
+        .footer-logo {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          letter-spacing: 4px;
+          font-size: 32px;
+          margin-bottom: 16px;
+        }
+
+        .footer-text {
+          font-size: 14px;
+          color: #555;
+          margin-bottom: 20px;
+        }
+
+        .footer-heading {
+          font-weight: 600;
+          letter-spacing: 1px;
+        .footer-blog-section {
+          margin-top: 24px;
+        }
+
+        .footer-blog-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+
+        .footer-blog-item {
+          text-decoration: none;
+          color: #111;
+          border-bottom: 1px solid #e6e6e6;
+          padding-bottom: 10px;
+        }
+
+        .footer-blog-item h5 {
+          margin: 4px 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        .footer-blog-item p {
+          margin: 0;
+          font-size: 13px;
+          color: #444;
+        }
+
+        .footer-blog-date {
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: #777;
+          text-transform: uppercase;
+        }
+
+        .footer-blog-cta {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #111;
+        }
+
+          text-transform: uppercase;
+          font-size: 13px;
+          margin-bottom: 12px;
+        }
+
+        .footer-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          font-size: 14px;
+        }
+
+        .footer-links a {
+          color: #111;
           text-decoration: none;
         }
 
-        footer .text-light:hover {
-          color: #fff !important;
+        .footer-links a:hover {
+          color: #000;
         }
 
-        .instagram-icon:hover {
-          background-color: white !important;
-          color: #343a40 !important;
-          transform: scale(1.1);
+        .footer-socials {
+          display: flex;
+          gap: 12px;
+          margin-top: 16px;
         }
 
-        @media (max-width: 768px) {
-          .text-end {
-            text-align: center !important;
-          }
-          
-          .text-start {
-            text-align: center !important;
+        .footer-socials a {
+          width: 36px;
+          height: 36px;
+          border: 1px solid #d4d5d9;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #111;
+        }
+
+        .footer-bottom {
+          border-top: 1px solid #e5e5e5;
+          margin-top: 40px;
+          padding-top: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 12px;
+          font-size: 13px;
+          color: #111;
+        }
+
+        .footer-bottom-links {
+          display: flex;
+          gap: 16px;
+        }
+
+        .footer-bottom-links a {
+          color: #111;
+          text-decoration: none;
+        }
+
+        .footer-bottom-links a:hover {
+          color: #000;
+        }
+
+        .chat-float-button {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 1000;
+          background: #000;
+          color: #fff;
+          padding: 12px 24px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .chat-float-button:hover {
+          background: #333;
+          color: #fff;
+          text-decoration: none;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        @media (max-width: 576px) {
+          .chat-float-button {
+            bottom: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            font-size: 13px;
           }
         }
+
       `}</style>
     </footer>
   );

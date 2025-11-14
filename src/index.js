@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "../node_modules/font-awesome/css/font-awesome.min.css";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import store from "./redux/store";
@@ -22,6 +23,9 @@ import {
   PrivacyPolicy,
   PageNotFound,
   ReturnPolicy,
+  Wishlist,
+  Blog,
+  BlogPost,
 } from "./pages";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
@@ -66,6 +70,7 @@ root.render(
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -83,6 +88,8 @@ root.render(
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route path="/return-policy" element={<ReturnPolicy />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
 
 
           {/* Catch-All Route */}

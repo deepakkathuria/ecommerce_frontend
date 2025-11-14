@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Routes, Route, Navigate } from "react-router-dom";
 import UserDetails from "./UserDetails";
 import Orders from "./Orders";
-import Wishlist from "./Wishlist";
 import Addresses from "./Addresses";
 import Settings from "./Settings";
 import { Navbar, Footer } from "../components";

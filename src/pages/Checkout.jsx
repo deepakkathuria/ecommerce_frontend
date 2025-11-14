@@ -212,8 +212,8 @@ const Checkout = () => {
                 </div>
               </div>
               <hr className="my-4" />
-              <button className="btn btn-primary w-100" type="submit">
-                Pay with Razorpay
+              <button className="btn btn-primary w-100 checkout-pay-btn" type="submit">
+                Pay Now
               </button>
             </form>
           </div>
@@ -254,6 +254,29 @@ const Checkout = () => {
         </div>
       </div>
       <Footer />
+
+      <style>{`
+        .checkout-pay-btn {
+          background: #000;
+          color: #fff;
+          border: none;
+          padding: 14px 24px;
+          font-size: 16px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: background 0.2s ease;
+        }
+
+        .checkout-pay-btn:hover {
+          background: #333;
+          color: #fff;
+        }
+
+        .checkout-pay-btn:active {
+          background: #000;
+        }
+      `}</style>
     </>
   );
 };

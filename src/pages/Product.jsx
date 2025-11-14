@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -13,12 +13,99 @@ const Product = () => {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showDescription, setShowDescription] = useState(true);
-
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const dispatch = useDispatch();
 
   let touchStartX = 0;
   let touchEndX = 0;
+
+  // Check if product is in wishlist
+  const checkWishlist = useCallback(async () => {
+    const token = localStorage.getItem("apitoken");
+    if (!token) return;
+
+    try {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data.items && Array.isArray(data.items)) {
+        const inWishlist = data.items.some(item => 
+          item.product_id === product.id || 
+          item.id === product.id ||
+          Number(item.product_id) === Number(product.id) ||
+          Number(item.id) === Number(product.id)
+        );
+        setIsInWishlist(inWishlist);
+      }
+    } catch (error) {
+      console.error("Error checking wishlist:", error);
+    }
+  }, [product.id]);
+
+  useEffect(() => {
+    if (product.id) {
+      checkWishlist();
+    }
+  }, [product.id, checkWishlist]);
+
+  const handleAddToWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const token = localStorage.getItem("apitoken");
+    if (!token) {
+      toast.error("Please login to add items to wishlist");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        // Remove from wishlist
+        const response = await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/wishlist/remove/${product.id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (response.ok) {
+          setIsInWishlist(false);
+          toast.success("Removed from wishlist");
+          window.dispatchEvent(new Event('wishlistUpdated'));
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to remove from wishlist");
+        }
+      } else {
+        // Add to wishlist
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ product_id: product.id }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          setIsInWishlist(true);
+          toast.success("Added to wishlist!");
+          setTimeout(() => {
+            checkWishlist();
+          }, 500);
+          window.dispatchEvent(new Event('wishlistUpdated'));
+        } else {
+          console.error("Wishlist API Error:", data);
+          throw new Error(data.error || data.message || "Failed to add to wishlist");
+        }
+      }
+    } catch (error) {
+      console.error("Wishlist error:", error);
+      toast.error(error.message || "Failed to update wishlist");
+    }
+  };
 
   const addProductToCart = async (product) => {
     const token = localStorage.getItem("apitoken");
@@ -36,7 +123,7 @@ const Product = () => {
             quantity: 1,
             name: product.title,
             price: product.price,
-            image: selectedImage || product.image,
+            image: selectedImage || images[0] || '',
             category: product.category || "General",
             categoryName: product.category || "General",
           },
@@ -60,59 +147,11 @@ const Product = () => {
         throw new Error(`Failed to add product to cart: ${errorData.error}`);
       }
 
-      toast.success("✅ Product added to cart successfully!");
+      toast.success("Product added to cart successfully!");
       dispatch(addCart(product));
     } catch (error) {
-      console.error("❌ Error adding product to cart:", error);
+      console.error("Error adding product to cart:", error);
       toast.error("Failed to add product to cart.");
-    }
-  };
-
-  const handleBuyNow = async (product) => {
-    const token = localStorage.getItem("apitoken");
-
-    if (!token) {
-      toast.error("Please login to continue.");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      const cartItem = {
-        items: [
-          {
-            id: product.id,
-            quantity: 1,
-            name: product.title,
-            price: product.price,
-            image: selectedImage || product.image,
-          },
-        ],
-      };
-
-      const response = await fetch(
-        "https://hammerhead-app-jkdit.ondigitalocean.app/cart/add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(cartItem),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Cart update failed");
-      }
-
-      dispatch(addCart(product));
-      toast.success("✅ Product added to cart. Redirecting to checkout...");
-      navigate("/cart");
-    } catch (err) {
-      console.error("Buy Now Error:", err);
-      toast.error("❌ Failed to proceed to checkout.");
     }
   };
 
@@ -128,10 +167,20 @@ const Product = () => {
         if (result.status === 200 && result.rows.length > 0) {
           const productData = result.rows[0];
 
-          const productImages =
-            productData.images?.length > 0
-              ? productData.images
-              : ["https://via.placeholder.com/400"];
+          let productImages = [];
+          try {
+            if (typeof productData.images === 'string') {
+              productImages = JSON.parse(productData.images);
+            } else if (Array.isArray(productData.images)) {
+              productImages = productData.images;
+            }
+          } catch (e) {
+            productImages = [];
+          }
+
+          if (productImages.length === 0) {
+            productImages = ["https://via.placeholder.com/400"];
+          }
 
           setProduct({
             id: productData.item_id,
@@ -139,17 +188,15 @@ const Product = () => {
             price: Math.round(productData.price) || 0,
             description: productData.description || "No description available",
             category: productData.category || "Uncategorized",
-            rating: {
-              rate: parseFloat(productData.avg_rating) || 0,
-              count: productData.ratings_length || 0,
-            },
+            subcategory: productData.subcategory || "",
+            code: productData.item_id || id,
           });
 
           setImages(productImages);
           setSelectedImage(productImages[0]);
         }
       } catch (error) {
-        console.error("❌ Error fetching product details:", error);
+        console.error("Error fetching product details:", error);
       } finally {
         setLoading(false);
       }
@@ -183,168 +230,71 @@ const Product = () => {
 
   const ShowProduct = () => {
     return (
-      <div className="container my-5 py-2">
-        <div className="row">
-          {/* Thumbnails for Desktop */}
-          <div className="col-md-1 d-none d-md-flex flex-column align-items-center">
-            {images.map((img, index) => (
+      <div className="product-detail-container">
+        <div className="product-detail-row">
+          {/* Left Side - Product Image */}
+          <div className="product-image-section">
+            <div className="product-main-image-wrapper">
               <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index + 1}`}
-                className={`img-thumbnail mb-2 ${
-                  selectedImage === img ? "border-primary" : ""
-                }`}
-                style={{
-                  cursor: "pointer",
-                  width: "60px",
-                  height: "60px",
-                  objectFit: "cover",
-                }}
-                onClick={() => handleImageClick(img)}
+                className="product-main-image"
+                src={selectedImage || images[0]}
+                alt={product.title}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                loading="lazy"
               />
-            ))}
+            </div>
+            
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="product-thumbnails">
+                {images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`Thumbnail ${index + 1}`}
+                    className={`product-thumbnail ${selectedImage === img ? 'active' : ''}`}
+                    onClick={() => handleImageClick(img)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Main Image */}
-          <div className="col-md-6 col-sm-12 py-3">
-            <img
-              className="img-fluid"
-              loading="lazy"
-              src={selectedImage?.replace(
-                "/upload/",
-                "/upload/f_auto,q_auto,w_800/"
-              )}
-              alt={product.title}
-              width="100%"
-              height="auto"
-              style={{ maxHeight: "500px", objectFit: "contain" }}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-            />
+          {/* Right Side - Product Info */}
+          <div className="product-info-section">
+            <div className="product-header">
+              <h1 className="product-title">{product.title}</h1>
+              <button
+                className={`product-wishlist-btn ${isInWishlist ? 'active' : ''}`}
+                onClick={handleAddToWishlist}
+                title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                <i className={`fa ${isInWishlist ? 'fa-bookmark' : 'fa-bookmark-o'}`}></i>
+              </button>
+            </div>
 
-            {/* Mobile Thumbnails */}
-            <div
-              className="d-flex d-md-none mt-3 overflow-auto"
-              style={{ gap: "10px" }}
+            <div className="product-price-section">
+              <div className="product-price">₹ {Number(product.price).toLocaleString('en-IN')}</div>
+              <div className="product-tax-info">MRP INCL. OF ALL TAXES</div>
+            </div>
+
+            <hr className="product-divider" />
+
+            <div className="product-code">
+              <span className="product-code-label">Product Code:</span>
+              <span className="product-code-value">{product.code || id}</span>
+            </div>
+
+            <button
+              className="product-add-btn"
+              onClick={() => addProductToCart(product)}
             >
-              {images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Thumbnail ${index + 1}`}
-                  onClick={() => handleImageClick(img)}
-                  style={{
-                    height: "60px",
-                    width: "60px",
-                    objectFit: "cover",
-                    border:
-                      selectedImage === img
-                        ? "2px solid #000"
-                        : "1px solid #ccc",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+              ADD
+            </button>
 
-          {/* Product Info */}
-          <div className="col-md-5 col-sm-12 py-5">
-            {/* ✅ Product Name */}
-            <h1 className="fw-bold mb-3" style={{ fontSize: "28px" }}>
-              {product.title}
-            </h1>
-
-            <h3 className="display-6 my-3">
-              <span style={{ fontWeight: "bold", color: "#000" }}>
-                Rs.{product.price}
-              </span>
-            </h3>
-
-            {/* ✅ Buttons FIRST */}
-            <div className="d-flex mt-2 gap-2">
-              <button
-                className="btn btn-dark btn-sm w-50"
-                onClick={() => addProductToCart(product)}
-              >
-                🛒 ADD TO CART
-              </button>
-              <button
-                className="btn btn-dark btn-sm w-50"
-                onClick={() => handleBuyNow(product)}
-              >
-                ⚡ BUY NOW
-              </button>
-            </div>
-
-            {/* ✅ Pricing */}
-
-            {/* ✅ Product Description Heading */}
-            {/* ✅ Product Description Section */}
-            <div className="mt-4">
-              <div
-                onClick={() => setShowDescription(!showDescription)}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  backgroundColor: "#f8f9fa",
-                  padding: "12px 16px",
-                  borderRadius: "6px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                }}
-              >
-                <h5 className="mb-0 fw-bold" style={{ fontSize: "16px" }}>
-                  📃 Product Description
-                </h5>
-                <span style={{ fontSize: "18px" }}>
-                  {showDescription ? "▲" : "▼"}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  maxHeight: showDescription ? "500px" : "0",
-                  overflow: "hidden",
-                  transition: "max-height 0.4s ease-in-out",
-                  background: "#fff",
-                  padding: showDescription ? "15px 16px" : "0 16px",
-                  borderRadius: "0 0 6px 6px",
-                  border: showDescription ? "1px solid #dee2e6" : "none",
-                  borderTop: "none",
-                }}
-              >
-                <div
-                  style={{
-                    maxHeight: showDescription ? "500px" : "0",
-                    overflow: "hidden",
-                    transition: "max-height 0.4s ease-in-out",
-                    background: "#fff",
-                    padding: showDescription ? "15px 20px 20px 20px" : "0 20px",
-                    borderRadius: "0 0 8px 8px",
-                    border: showDescription ? "1px solid #dee2e6" : "none",
-                    borderTop: "none",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: "15px",
-                      color: "#444",
-                      lineHeight: "1.5",
-                      letterSpacing: "0.2px",
-                      padding: "0",
-                      margin: "0",
-                      textAlign: "justify",
-                      fontFamily: "'Poppins', 'Segoe UI', sans-serif",
-                    }}
-                  >
-                    {product.description}
-                  </p>
-                </div>
-              </div>
+            <div className="product-description">
+              <p>{product.description}</p>
             </div>
           </div>
         </div>
@@ -355,12 +305,260 @@ const Product = () => {
   return (
     <>
       <Navbar />
-      <div className="container">
-        <div className="row">
-          {loading ? <Skeleton height={400} /> : <ShowProduct />}
+      {loading ? (
+        <div className="container my-5">
+          <Skeleton height={600} />
         </div>
-      </div>
+      ) : (
+        <ShowProduct />
+      )}
       <Footer />
+
+      <style>{`
+        .product-detail-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 15px 20px;
+          background: #fafafa;
+        }
+
+        .product-detail-row {
+          display: flex;
+          gap: 60px;
+          align-items: flex-start;
+        }
+
+        /* Left Side - Image Section */
+        .product-image-section {
+          flex: 1;
+          max-width: 50%;
+        }
+
+        .product-main-image-wrapper {
+          width: 100%;
+          background: #fff;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          min-height: 500px;
+          margin-bottom: 12px;
+          padding-top: 0;
+        }
+
+        .product-main-image {
+          max-width: 100%;
+          max-height: 500px;
+          object-fit: contain;
+          width: auto;
+          height: auto;
+          margin-top: 0;
+        }
+
+        .product-thumbnails {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          padding: 0;
+          max-width: 100%;
+        }
+
+        .product-thumbnail {
+          width: 65px;
+          height: 65px;
+          object-fit: cover;
+          border: 2px solid transparent;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          background: #fff;
+          padding: 2px;
+          flex-shrink: 0;
+        }
+
+        .product-thumbnail:hover {
+          border-color: #000;
+        }
+
+        .product-thumbnail.active {
+          border-color: #000;
+        }
+
+        /* Right Side - Info Section */
+        .product-info-section {
+          flex: 1;
+          max-width: 50%;
+          padding-top: 0;
+        }
+
+        .product-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 20px;
+        }
+
+        .product-title {
+          font-size: 24px;
+          font-weight: 400;
+          color: #000;
+          line-height: 1.4;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin: 0;
+          flex: 1;
+          padding-right: 20px;
+        }
+
+        .product-wishlist-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 24px;
+          color: #000;
+          padding: 5px;
+          transition: color 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .product-wishlist-btn:hover {
+          color: #ff3f6c;
+        }
+
+        .product-wishlist-btn.active {
+          color: #ff3f6c;
+        }
+
+        .product-price-section {
+          margin-bottom: 20px;
+        }
+
+        .product-price {
+          font-size: 28px;
+          font-weight: 500;
+          color: #000;
+          margin-bottom: 8px;
+        }
+
+        .product-tax-info {
+          font-size: 12px;
+          color: #696e79;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .product-divider {
+          border: none;
+          border-top: 1px solid #eaeaec;
+          margin: 20px 0;
+        }
+
+        .product-code {
+          font-size: 13px;
+          color: #282c3f;
+          margin-bottom: 30px;
+        }
+
+        .product-code-label {
+          margin-right: 8px;
+        }
+
+        .product-code-value {
+          font-weight: 500;
+        }
+
+        .product-add-btn {
+          width: 100%;
+          background: #000;
+          color: #fff;
+          border: none;
+          padding: 14px 24px;
+          font-size: 14px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          cursor: pointer;
+          transition: background 0.2s ease;
+          margin-bottom: 40px;
+        }
+
+        .product-add-btn:hover {
+          background: #333;
+        }
+
+        .product-description {
+          margin-bottom: 30px;
+        }
+
+        .product-description p {
+          font-size: 14px;
+          font-weight: 400;
+          color: #282c3f;
+          line-height: 1.6;
+          margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+          .product-detail-container {
+            padding: 20px 15px;
+          }
+
+          .product-detail-row {
+            flex-direction: column;
+            gap: 30px;
+          }
+
+          .product-image-section {
+            max-width: 100%;
+          }
+
+          .product-info-section {
+            max-width: 100%;
+          }
+
+          .product-main-image-wrapper {
+            min-height: 400px;
+            margin-bottom: 15px;
+          }
+
+          .product-main-image {
+            max-height: 400px;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .product-detail-container {
+            padding: 15px 15px;
+          }
+
+          .product-title {
+            font-size: 18px;
+          }
+
+          .product-price {
+            font-size: 24px;
+          }
+
+          .product-main-image-wrapper {
+            min-height: 300px;
+            margin-bottom: 10px;
+          }
+
+          .product-main-image {
+            max-height: 300px;
+          }
+
+          .product-thumbnail {
+            width: 60px;
+            height: 60px;
+          }
+
+          .product-thumbnails {
+            gap: 8px;
+          }
+        }
+      `}</style>
     </>
   );
 };
