@@ -1,6 +1,5 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { blogHighlights } from "../data/blogHighlights";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -15,20 +14,13 @@ const Footer = () => {
             <p className="footer-text">
               Contemporary jewellery and accessories curated for every story.
             </p>
-            <div className="footer-blog-section">
-              <p className="footer-heading mb-2">From the Journal</p>
-              <div className="footer-blog-list">
-                {blogHighlights.map((post) => (
-                  <NavLink key={post.id} to={post.slug} className="footer-blog-item">
-                    <span className="footer-blog-date">{post.date}</span>
-                    <h5>{post.title}</h5>
-                    <p>{post.excerpt}</p>
-                  </NavLink>
-                ))}
-              </div>
-              <NavLink to="/blog" className="footer-blog-cta">
-                Read all articles →
-              </NavLink>
+            <div className="newsletter-box">
+              <input
+                type="email"
+                placeholder="Join our newsletter"
+                className="newsletter-input"
+              />
+              <button className="newsletter-btn">Subscribe</button>
             </div>
           </div>
 
@@ -114,53 +106,34 @@ const Footer = () => {
           margin-bottom: 20px;
         }
 
+        .newsletter-box {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .newsletter-input {
+          flex: 1;
+          min-width: 200px;
+          border: 1px solid #d4d5d9;
+          padding: 10px 12px;
+          border-radius: 4px;
+          font-size: 14px;
+        }
+
+        .newsletter-btn {
+          background: #111;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          text-transform: uppercase;
+          font-size: 12px;
+          letter-spacing: 1px;
+        }
+
         .footer-heading {
           font-weight: 600;
           letter-spacing: 1px;
-        .footer-blog-section {
-          margin-top: 24px;
-        }
-
-        .footer-blog-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          margin-bottom: 8px;
-        }
-
-        .footer-blog-item {
-          text-decoration: none;
-          color: #111;
-          border-bottom: 1px solid #e6e6e6;
-          padding-bottom: 10px;
-        }
-
-        .footer-blog-item h5 {
-          margin: 4px 0;
-          font-size: 16px;
-          font-weight: 600;
-        }
-
-        .footer-blog-item p {
-          margin: 0;
-          font-size: 13px;
-          color: #444;
-        }
-
-        .footer-blog-date {
-          font-size: 12px;
-          letter-spacing: 1px;
-          color: #777;
-          text-transform: uppercase;
-        }
-
-        .footer-blog-cta {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #111;
-        }
-
           text-transform: uppercase;
           font-size: 13px;
           margin-bottom: 12px;
