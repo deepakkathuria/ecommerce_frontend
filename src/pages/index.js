@@ -11,6 +11,8 @@ export { default as Profile } from './Profile';
 export { default as OrderDetails } from './OrderDetails'; // ✅ Added this line
 export { default as InvoicePage } from './InvoicePage'; // ✅ Added this line
 export { default as Wishlist } from './Wishlist'; // ✅ Added this line
+export { default as Blog } from './Blog';
+export { default as BlogPost } from './BlogPost';
 
 export { default as PrivacyPolicy } from './PrivacyPolicy'; // ✅ Added this line
 export { default as ReturnPolicy } from './ReturnPolicy'; // ✅ Added this line

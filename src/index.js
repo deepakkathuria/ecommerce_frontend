@@ -24,6 +24,8 @@ import {
   PageNotFound,
   ReturnPolicy,
   Wishlist,
+  Blog,
+  BlogPost,
 } from "./pages";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
@@ -86,6 +88,8 @@ root.render(
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route path="/return-policy" element={<ReturnPolicy />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
 
 
           {/* Catch-All Route */}
