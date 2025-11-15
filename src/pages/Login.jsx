@@ -246,15 +246,17 @@ const Login = () => {
         callback: window.handleGoogleLogin,
       });
 
-      window.google.accounts.id.renderButton(
-        document.getElementById("google-login-button"),
-        {
+      const target = document.getElementById("google-login-button");
+      if (target) {
+        const buttonWidth = Math.max(target.offsetWidth, 320);
+        window.google.accounts.id.renderButton(target, {
           theme: "outline",
           size: "large",
           shape: "rectangular",
           text: "signin_with",
-        }
-      );
+          width: buttonWidth,
+        });
+      }
     }
   }, [dispatch, navigate]);
 
