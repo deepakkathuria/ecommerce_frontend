@@ -413,6 +413,17 @@ const Login = () => {
         .google-shell {
           display: flex;
           justify-content: center;
+          min-height: 54px;
+          align-items: center;
+        }
+
+        #google-login-button {
+          width: 100%;
+        }
+
+        #google-login-button > div {
+          width: 100% !important;
+          min-height: 48px !important;
         }
         @media (max-width: 576px) {
           .login-card {

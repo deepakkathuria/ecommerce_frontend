@@ -5,6 +5,9 @@ import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
+import { Toaster } from "react-hot-toast";
+import ScrollToTop from "./components/ScrollToTop";
+import { syncCart } from "./redux/action";
 import store from "./redux/store";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -25,9 +28,6 @@ const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
-import ScrollToTop from "./components/ScrollToTop";
-import { Toaster } from "react-hot-toast";
-import { syncCart } from "./redux/action"; // ✅ Import syncCart action
 
 // ✅ Component to Fetch Cart on Load
 const FetchCartOnLoad = () => {
