@@ -207,7 +207,6 @@ const Login = () => {
   };
 
   useEffect(() => {
-    /* Global callback */
     window.handleGoogleLogin = async (response) => {
       try {
         const res = await fetch(
@@ -240,7 +239,6 @@ const Login = () => {
       }
     };
 
-    /* Render Google Sign-In Button */
     if (window.google && window.google.accounts && window.google.accounts.id) {
       window.google.accounts.id.initialize({
         client_id:
@@ -263,17 +261,22 @@ const Login = () => {
   return (
     <>
       <Navbar />
-      <div className="container my-3 py-3">
-        <h1 className="text-center">Login</h1>
-        <hr />
-        <div className="row my-4 h-100">
-          <div className="col-md-4 col-lg-4 col-sm-8 mx-auto">
-            <form onSubmit={handleLogin}>
-              <div className="my-3">
+      <section className="login-page">
+        <div className="container">
+          <div className="login-heading text-center">
+            <p className="eyebrow">Account access</p>
+            <h1>Sign in to ZAIRI</h1>
+            <p className="subtext">
+              Manage orders, wishlist, and saved bag items in one place.
+            </p>
+          </div>
+
+          <div className="login-card mx-auto">
+            <form onSubmit={handleLogin} className="login-form">
+              <div className="form-group">
                 <label htmlFor="email">Email address</label>
                 <input
                   type="email"
-                  className="form-control"
                   id="email"
                   placeholder="name@example.com"
                   value={email}
@@ -281,49 +284,145 @@ const Login = () => {
                   required
                 />
               </div>
-              <div className="my-3">
+              <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <input
                   type="password"
-                  className="form-control"
                   id="password"
-                  placeholder="Password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <div className="my-3">
-                <p>
-                  New Here?{" "}
-                  <Link
-                    to="/register"
-                    className="text-decoration-underline text-info"
-                  >
-                    Register
-                  </Link>
-                </p>
+              {error && <div className="login-error">{error}</div>}
+              <div className="login-meta">
+                <span>New here?</span>
+                <Link to="/register">Create an account</Link>
               </div>
-              <div className="text-center">
-                <button
-                  className="my-2 mx-auto btn btn-dark"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading ? "Logging in..." : "Login"}
-                </button>
-              </div>
+              <button type="submit" className="login-btn" disabled={loading}>
+                {loading ? "Signing in..." : "Login"}
+              </button>
             </form>
 
-            {/* ✅ Google Sign-In Button */}
-            <div className="flex justify-center mt-3 w-full">
-              <div id="google-login-button"></div>
+            <div className="login-divider">
+              <span>or continue with</span>
             </div>
+            <div id="google-login-button" className="google-shell" />
           </div>
         </div>
-      </div>
+      </section>
       <Footer />
+      <style>{`
+        .login-page {
+          background: #fafafa;
+          padding: 80px 0 120px;
+          min-height: calc(100vh - 300px);
+        }
+        .login-heading .eyebrow {
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-size: 12px;
+          color: #777;
+          margin-bottom: 10px;
+        }
+        .login-heading h1 {
+          font-size: 38px;
+          letter-spacing: 2px;
+          margin-bottom: 10px;
+        }
+        .login-heading .subtext {
+          color: #5c5c5c;
+          font-size: 15px;
+        }
+        .login-card {
+          max-width: 480px;
+          width: 100%;
+          background: #fff;
+          border: 1px solid #e6e6e6;
+          padding: 40px;
+          margin-top: 40px;
+        }
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .form-group label {
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-size: 12px;
+          color: #555;
+        }
+        .form-group input {
+          border: none;
+          border-bottom: 1px solid #cfcfcf;
+          padding: 12px 0;
+          font-size: 15px;
+          background: transparent;
+          border-radius: 0;
+        }
+        .form-group input:focus {
+          outline: none;
+          border-color: #111;
+        }
+        .login-error {
+          background: #ffeceb;
+          color: #a20000;
+          font-size: 13px;
+          padding: 10px 14px;
+        }
+        .login-meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13px;
+          color: #666;
+        }
+        .login-meta a {
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-size: 12px;
+          color: #111;
+        }
+        .login-btn {
+          width: 100%;
+          background: #111;
+          color: #fff;
+          border: none;
+          padding: 14px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-size: 13px;
+        }
+        .login-btn:disabled {
+          opacity: 0.6;
+        }
+        .login-divider {
+          text-align: center;
+          margin: 24px 0 12px;
+          font-size: 12px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #999;
+        }
+        .google-shell {
+          display: flex;
+          justify-content: center;
+        }
+        @media (max-width: 576px) {
+          .login-card {
+            padding: 32px 24px;
+          }
+          .login-heading h1 {
+            font-size: 28px;
+          }
+        }
+      `}</style>
     </>
   );
 };

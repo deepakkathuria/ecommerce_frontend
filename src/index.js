@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import "../node_modules/font-awesome/css/font-awesome.min.css";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
@@ -7,26 +7,24 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import store from "./redux/store";
 
-import {
-  Home,
-  Product,
-  Products,
-  AboutPage,
-  ContactPage,
-  Cart,
-  Login,
-  Register,
-  Checkout,
-  Profile,
-  OrderDetails,
-  InvoicePage,
-  PrivacyPolicy,
-  PageNotFound,
-  ReturnPolicy,
-  Wishlist,
-  Blog,
-  BlogPost,
-} from "./pages";
+const Home = lazy(() => import("./pages/Home"));
+const Product = lazy(() => import("./pages/Product"));
+const Products = lazy(() => import("./pages/Products"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Profile = lazy(() => import("./pages/Profile"));
+const OrderDetails = lazy(() => import("./pages/OrderDetails"));
+const InvoicePage = lazy(() => import("./pages/InvoicePage"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const PageNotFound = lazy(() => import("./pages/PageNotFound"));
+const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
 import { syncCart } from "./redux/action"; // ✅ Import syncCart action
@@ -57,6 +55,14 @@ const FetchCartOnLoad = () => {
   return null;
 };
 
+const PageLoader = () => (
+  <div className="page-loader">
+    <span className="loader-dot" />
+    <span className="loader-dot" />
+    <span className="loader-dot" />
+  </div>
+);
+
 // ✅ Include FetchCartOnLoad inside Provider
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -64,37 +70,38 @@ root.render(
     <ScrollToTop>
       <Provider store={store}>
         <FetchCartOnLoad /> {/* ✅ Fetch cart on load */}
-        <Routes>
-          {/* Main Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/checkout" element={<Checkout />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Main Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/checkout" element={<Checkout />} />
 
-          {/* Product Routes */}
-          <Route path="/product" element={<Products />} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/product/*" element={<PageNotFound />} /> {/* Handle unknown product routes */}
+            {/* Product Routes */}
+            <Route path="/product" element={<Products />} />
+            <Route path="/product/:id" element={<Product />} />
+            <Route path="/product/*" element={<PageNotFound />} /> {/* Handle unknown product routes */}
 
-          {/* Profile & Order Routes */}
-          <Route path="/profile/*" element={<Profile />} />
-          <Route path="/profile/orders/:orderId" element={<OrderDetails />} />
+            {/* Profile & Order Routes */}
+            <Route path="/profile/*" element={<Profile />} />
+            <Route path="/profile/orders/:orderId" element={<OrderDetails />} />
 
-          <Route path="/invoice/:orderId" element={<InvoicePage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/invoice/:orderId" element={<InvoicePage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-          <Route path="/return-policy" element={<ReturnPolicy />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/return-policy" element={<ReturnPolicy />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
 
-
-          {/* Catch-All Route */}
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
+            {/* Catch-All Route */}
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </Suspense>
       </Provider>
     </ScrollToTop>
     <Toaster />

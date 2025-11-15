@@ -1,11 +1,16 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import toast from "react-hot-toast";
 import SearchModal from "./SearchModal";
+
+const normalizeId = (value) => {
+  if (value === null || value === undefined) return "";
+  return String(value);
+};
 
 const Products = () => {
   const [originalData, setOriginalData] = useState([]);
@@ -25,6 +30,7 @@ const Products = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [wishlistIds, setWishlistIds] = useState([]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,42 +38,43 @@ const Products = () => {
   const sortDropdownRef = useRef(null);
   const filterDropdownRef = useRef(null);
 
-  console.log('🔄 Products component render - searchTerm:', searchTerm);
-
   // Handle URL parameters for search and filters (only on initial load)
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const searchFromURL = searchParams.get('search');
-    const categoryFromURL = searchParams.get('category');
-    const subcategoryFromURL = searchParams.get('subcategory');
+    const searchFromURL = searchParams.get("search");
+    const categoryFromURL = searchParams.get("category");
+    const subcategoryFromURL = searchParams.get("subcategory");
 
-    if (searchFromURL && !searchTerm) {
-      setSearchTerm(searchFromURL);
-    }
+    setSearchTerm((prev) => prev || searchFromURL || "");
+
     if (categoryFromURL) {
       setSelectedCategory(categoryFromURL.toLowerCase());
       if (subcategoryFromURL) {
         setSelectedSubcategory(subcategoryFromURL.toLowerCase());
+      } else {
+        setSelectedSubcategory("");
       }
+    } else {
+      setSelectedCategory("all");
+      setSelectedSubcategory("");
     }
   }, [location.search]);
 
   // Memoized filtered data for better performance
   const filteredData = useMemo(() => {
-    console.log('🔍 filteredData useMemo running - searchTerm:', searchTerm);
-    let filtered = originalData;
+    let filtered = [...originalData];
 
     // Category filter
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(item => item.category === selectedCategory);
+      filtered = filtered.filter((item) => item.category === selectedCategory);
       if (selectedSubcategory) {
-        filtered = filtered.filter(item => item.subcategory === selectedSubcategory);
+        filtered = filtered.filter((item) => item.subcategory === selectedSubcategory);
       }
     }
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(item =>
+      filtered = filtered.filter((item) =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,8 +83,8 @@ const Products = () => {
     }
 
     // Price range filter
-    filtered = filtered.filter(item => 
-      item.price >= priceRange.min && item.price <= priceRange.max
+    filtered = filtered.filter(
+      (item) => item.price >= priceRange.min && item.price <= priceRange.max
     );
 
     // Sort
@@ -97,6 +104,8 @@ const Products = () => {
 
     return filtered;
   }, [originalData, selectedCategory, selectedSubcategory, searchTerm, sortBy, priceRange]);
+
+  const wishlistIdSet = useMemo(() => new Set(wishlistIds), [wishlistIds]);
 
   useEffect(() => {
     setFilter(filteredData);
@@ -160,15 +169,42 @@ const Products = () => {
     getProducts();
   }, [page]);
 
+  const fetchWishlist = useCallback(async () => {
+    const token = localStorage.getItem("apitoken");
+    if (!token) {
+      setWishlistIds([]);
+      return;
+    }
+    try {
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const items = Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
+        const ids = items
+          .map((item) => normalizeId(item.product_id ?? item.id ?? item.item_id))
+          .filter(Boolean);
+        setWishlistIds(ids);
+      }
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWishlist();
+  }, [fetchWishlist]);
+
   const filterBySubcategory = useCallback((category, subcategory) => {
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
     const params = new URLSearchParams(location.search);
-    params.set('category', category);
+    params.set("category", category);
     if (subcategory) {
-      params.set('subcategory', subcategory);
+      params.set("subcategory", subcategory);
     } else {
-      params.delete('subcategory');
+      params.delete("subcategory");
     }
     navigate(`/product?${params.toString()}`);
   }, [navigate, location.search]);
@@ -177,8 +213,8 @@ const Products = () => {
     setSelectedCategory("all");
     setSelectedSubcategory("");
     const params = new URLSearchParams(location.search);
-    params.delete('category');
-    params.delete('subcategory');
+    params.delete("category");
+    params.delete("subcategory");
     navigate(`/product?${params.toString()}`);
   }, [navigate, location.search]);
 
@@ -208,8 +244,8 @@ const Products = () => {
     setSelectedCategory(category);
     setSelectedSubcategory("");
     const params = new URLSearchParams(location.search);
-    params.set('category', category);
-    params.delete('subcategory');
+    params.set("category", category);
+    params.delete("subcategory");
     navigate(`/product?${params.toString()}`);
     setIsFilterDropdownOpen(false);
   }, [filterAll, location.search, navigate]);
@@ -239,6 +275,109 @@ const Products = () => {
   const handleClearSearch = useCallback(() => {
     setSearchTerm("");
   }, []);
+
+  const handleAddToCart = useCallback(async (product) => {
+    const token = localStorage.getItem("apitoken");
+    if (!token) {
+      toast.error("Please login to add items to cart");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const cartItem = {
+        items: [
+          {
+            id: product.id,
+            quantity: 1,
+            name: product.title,
+            price: product.price,
+            image: product.images && product.images.length > 0 ? product.images[0] : "",
+          },
+        ],
+      };
+
+      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(cartItem),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add to cart");
+      }
+
+      const productWithCategory = {
+        ...product,
+        category: product.category || "General",
+        categoryName: product.category || "General",
+      };
+
+      dispatch(addCart(productWithCategory));
+      toast.success("Added to cart!");
+    } catch (error) {
+      console.error("Cart error:", error);
+      toast.error(error.message || "Failed to add to cart");
+    }
+  }, [dispatch, navigate]);
+
+  const handleToggleWishlist = useCallback(async (product) => {
+    const token = localStorage.getItem("apitoken");
+    if (!token) {
+      toast.error("Please login to add items to wishlist");
+      navigate("/login");
+      return;
+    }
+
+    const productId = normalizeId(product.id);
+    const alreadyInWishlist = wishlistIdSet.has(productId);
+
+    try {
+      if (alreadyInWishlist) {
+        const response = await fetch(
+          `https://hammerhead-app-jkdit.ondigitalocean.app/wishlist/remove/${product.id}`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to remove from wishlist");
+        }
+
+        setWishlistIds((prev) => prev.filter((id) => id !== productId));
+        toast.success("Removed from wishlist");
+      } else {
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ product_id: product.id }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          console.error("Wishlist API Error - Status:", response.status, "Data:", data);
+          throw new Error(data.error || data.message || `Failed to add to wishlist (Status: ${response.status})`);
+        }
+
+        setWishlistIds((prev) => [...prev, productId]);
+        toast.success("Added to wishlist!");
+      }
+
+      window.dispatchEvent(new Event("wishlistUpdated"));
+    } catch (error) {
+      console.error("Wishlist error:", error);
+      toast.error(error.message || "Failed to update wishlist");
+    }
+  }, [navigate, wishlistIdSet]);
 
   const Loading = () => (
     <div className="container-fluid">
@@ -405,10 +544,13 @@ const Products = () => {
       {/* Products Grid/List */}
       <div className={`row ${viewMode === "list" ? "g-3" : "g-3"}`}>
         {filteredData.map((product) => (
-          <ProductCard 
-            key={product.id} 
-            product={product} 
+          <ProductCard
+            key={product.id}
+            product={product}
             viewMode={viewMode}
+            isWishlisted={wishlistIdSet.has(normalizeId(product.id))}
+            onToggleWishlist={handleToggleWishlist}
+            onQuickAdd={handleAddToCart}
           />
         ))}
       </div>
@@ -917,12 +1059,8 @@ const Products = () => {
   );
 };
 
-const ProductCard = ({ product, viewMode }) => {
+const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, onQuickAdd }) => {
   const [currentImage, setCurrentImage] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isInWishlist, setIsInWishlist] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   // Use original image quality - return as is
   const optimizeImage = (url) => {
@@ -931,150 +1069,16 @@ const ProductCard = ({ product, viewMode }) => {
     return url;
   };
 
-  // Check if product is in wishlist
-  const checkWishlist = useCallback(async () => {
-    const token = localStorage.getItem("apitoken");
-    if (!token) return;
-
-    try {
-      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (response.ok && data.items && Array.isArray(data.items)) {
-        const inWishlist = data.items.some(item => 
-          item.product_id === product.id || 
-          item.id === product.id ||
-          Number(item.product_id) === Number(product.id) ||
-          Number(item.id) === Number(product.id)
-        );
-        setIsInWishlist(inWishlist);
-      } else if (!response.ok) {
-        console.error("Wishlist fetch error:", data);
-      }
-    } catch (error) {
-      console.error("Error checking wishlist:", error);
-    }
-  }, [product.id]);
-
-  useEffect(() => {
-    checkWishlist();
-  }, [checkWishlist]);
-
-  const handleAddToWishlist = async (e) => {
+  const handleWishlistClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const token = localStorage.getItem("apitoken");
-    if (!token) {
-      toast.error("Please login to add items to wishlist");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      if (isInWishlist) {
-        // Remove from wishlist
-        const response = await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/wishlist/remove/${product.id}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
-        if (response.ok) {
-          setIsInWishlist(false);
-          toast.success("Removed from wishlist");
-          // Notify Navbar to update wishlist count
-          window.dispatchEvent(new Event('wishlistUpdated'));
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to remove from wishlist");
-        }
-      } else {
-        // Add to wishlist
-        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/wishlist/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ product_id: product.id }),
-        });
-        
-        const data = await response.json();
-        
-        console.log("Wishlist Add Response:", { status: response.status, statusText: response.statusText, data });
-        
-        if (response.ok) {
-          setIsInWishlist(true);
-          toast.success("Added to wishlist!");
-          // Refresh wishlist check to ensure sync
-          setTimeout(() => {
-            checkWishlist();
-          }, 500);
-          // Notify Navbar to update wishlist count
-          window.dispatchEvent(new Event('wishlistUpdated'));
-        } else {
-          console.error("Wishlist API Error - Status:", response.status, "Data:", data);
-          throw new Error(data.error || data.message || `Failed to add to wishlist (Status: ${response.status})`);
-        }
-      }
-    } catch (error) {
-      console.error("Wishlist error:", error);
-      toast.error(error.message || "Failed to update wishlist");
-    }
+    onToggleWishlist(product);
   };
 
-  const handleAddToCart = async (e) => {
+  const handleAddToCartClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const token = localStorage.getItem("apitoken");
-    if (!token) {
-      toast.error("Please login to add items to cart");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      // Format product for backend API
-      const cartItem = {
-        items: [{
-          id: product.id,
-          quantity: 1,
-          name: product.title,
-          price: product.price,
-          image: product.images && product.images.length > 0 ? product.images[0] : '',
-        }],
-      };
-
-      // Add to cart via API
-      const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(cartItem),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add to cart");
-      }
-
-      // Ensure product has proper category information for Redux
-      const productWithCategory = {
-        ...product,
-        category: product.category || "General",
-        categoryName: product.category || "General",
-      };
-
-      // Update Redux store
-      dispatch(addCart(productWithCategory));
-      toast.success("Added to cart!");
-    } catch (error) {
-      console.error("Cart error:", error);
-      toast.error(error.message || "Failed to add to cart");
-    }
+    onQuickAdd(product);
   };
 
   if (viewMode === "list") {
@@ -1136,7 +1140,7 @@ const ProductCard = ({ product, viewMode }) => {
                     </Link>
                     <button
                       className="btn btn-primary btn-sm"
-                      onClick={handleAddToCart}
+                      onClick={handleAddToCartClick}
                     >
                       <i className="fa fa-cart-plus"></i> Add to Cart
                     </button>
@@ -1152,11 +1156,7 @@ const ProductCard = ({ product, viewMode }) => {
 
   return (
     <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-      <div 
-        className="product-card-zara"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <div className="product-card-zara">
         <div className="product-image-container">
           <Link to={`/product/${product.id}`}>
             <img
@@ -1169,17 +1169,17 @@ const ProductCard = ({ product, viewMode }) => {
           
           {/* Wishlist Heart Button */}
           <button
-            className={`wishlist-button ${isInWishlist ? 'active' : ''}`}
-            onClick={handleAddToWishlist}
-            title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            className={`wishlist-button ${isWishlisted ? "active" : ""}`}
+            onClick={handleWishlistClick}
+            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
-            <i className={`fa ${isInWishlist ? 'fa-heart' : 'fa-heart-o'}`}></i>
+            <i className={`fa ${isWishlisted ? "fa-heart" : "fa-heart-o"}`}></i>
           </button>
 
           {/* Quick Add to Cart Button - Small + icon */}
           <button
             className="quick-add-button"
-            onClick={handleAddToCart}
+            onClick={handleAddToCartClick}
             title="Add to Cart"
           >
             <i className="fa fa-plus"></i>
@@ -1195,6 +1195,8 @@ const ProductCard = ({ product, viewMode }) => {
       </div>
     </div>
   );
-};
+});
 
-export default Products; 
+ProductCard.displayName = "ProductCard";
+
+export default Products;
