@@ -318,8 +318,8 @@ const Login = () => {
       <style>{`
         .login-page {
           background: #fafafa;
-          padding: 80px 0 120px;
-          min-height: calc(100vh - 300px);
+          padding: 60px 0 80px;
+          min-height: auto;
         }
         .login-heading .eyebrow {
           text-transform: uppercase;
@@ -342,8 +342,8 @@ const Login = () => {
           width: 100%;
           background: #fff;
           border: 1px solid #e6e6e6;
-          padding: 40px;
-          margin-top: 40px;
+          padding: 36px;
+          margin-top: 28px;
         }
         .login-form {
           display: flex;
@@ -429,7 +429,7 @@ const Login = () => {
         }
         @media (max-width: 576px) {
           .login-card {
-            padding: 32px 24px;
+            padding: 28px 24px;
           }
           .login-heading h1 {
             font-size: 28px;
