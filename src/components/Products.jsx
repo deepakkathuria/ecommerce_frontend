@@ -283,20 +283,14 @@ const Products = () => {
     if (!token) {
       toast.error("Please login to add items to cart");
       navigate("/login");
-      return;
+      return "no-auth";
     }
 
     // 🚫 Enforce max 1 piece per product
     const alreadyInCart = cartState.some((item) => item.id === product.id);
     if (alreadyInCart) {
-      toast((t) => (
-        <span>
-          This piece is <strong>one-of-a-kind</strong> and limited to 1 per customer.
-          <br />
-          For more pieces or custom orders, please DM us on Instagram or WhatsApp.
-        </span>
-      ));
-      return;
+      // Indicate to the caller that this product is already present
+      return "already-in-cart";
     }
 
     try {
@@ -334,9 +328,11 @@ const Products = () => {
 
       dispatch(addCart(productWithCategory));
       toast.success("Added to cart!");
+      return "added";
     } catch (error) {
       console.error("Cart error:", error);
       toast.error(error.message || "Failed to add to cart");
+      return "error";
     }
   }, [dispatch, navigate, cartState]);
 
@@ -760,6 +756,21 @@ const Products = () => {
           transition: transform 0.3s ease;
         }
 
+        .product-card-out-of-stock-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          font-size: 12px;
+          font-weight: 500;
+          color: #ffffff;
+          pointer-events: none;
+        }
+
         .product-card-zara:hover .product-image {
           transform: scale(1.05);
         }
@@ -1076,6 +1087,7 @@ const Products = () => {
 
 const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, onQuickAdd }) => {
   const [currentImage, setCurrentImage] = useState(0);
+  const [outOfStock, setOutOfStock] = useState(false);
 
   // Use original image quality - return as is
   const optimizeImage = (url) => {
@@ -1090,10 +1102,13 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
     onToggleWishlist(product);
   };
 
-  const handleAddToCartClick = (e) => {
+  const handleAddToCartClick = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    onQuickAdd(product);
+    const result = await onQuickAdd(product);
+    if (result === "already-in-cart") {
+      setOutOfStock(true);
+    }
   };
 
   if (viewMode === "list") {
@@ -1181,6 +1196,12 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
               alt={product.title}
             />
           </Link>
+
+          {outOfStock && (
+            <div className="product-card-out-of-stock-overlay">
+              <span>OUT OF STOCK</span>
+            </div>
+          )}
           
           {/* Wishlist Heart Button */}
           <button
@@ -1195,7 +1216,8 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
           <button
             className="quick-add-button"
             onClick={handleAddToCartClick}
-            title="Add to Cart"
+            title={outOfStock ? "Out of stock" : "Add to Cart"}
+            disabled={outOfStock}
           >
             <i className="fa fa-plus"></i>
           </button>
