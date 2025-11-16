@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../redux/action";
 import { Navbar, Footer } from "../components";
 import toast from "react-hot-toast";
@@ -10,8 +10,10 @@ import "react-loading-skeleton/dist/skeleton.css";
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [outOfStockMap, setOutOfStockMap] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const cartState = useSelector((state) => state.handleCart);
 
   const fetchWishlist = async () => {
     const token = localStorage.getItem("apitoken");
@@ -94,10 +96,19 @@ const Wishlist = () => {
       return;
     }
 
+    const productId = item.product_id || item.id;
+
+    // If item is already in cart, show OUT OF STOCK overlay on this wishlist card
+    const alreadyInCart = cartState.some((cartItem) => cartItem.id === productId);
+    if (alreadyInCart) {
+      setOutOfStockMap((prev) => ({ ...prev, [productId]: true }));
+      return;
+    }
+
     try {
       const cartItem = {
         items: [{
-          id: item.product_id || item.id,
+          id: productId,
           quantity: 1,
           name: item.name,
           price: item.price,
@@ -120,7 +131,7 @@ const Wishlist = () => {
       }
 
       const productWithCategory = {
-        id: item.product_id || item.id,
+        id: productId,
         title: item.name,
         price: item.price,
         images: item.image ? [item.image] : [],
@@ -171,20 +182,28 @@ const Wishlist = () => {
           </div>
         ) : (
           <div className="row">
-            {wishlist.map((item) => (
-              <div key={item.id || item.product_id} className="col-6 col-md-4 col-lg-3 mb-4">
+            {wishlist.map((item) => {
+              const productId = item.product_id || item.id;
+              const isOutOfStock = !!outOfStockMap[productId];
+              return (
+              <div key={productId} className="col-6 col-md-4 col-lg-3 mb-4">
                 <div className="product-card-zara position-relative">
                   <div className="product-image-container">
-                    <Link to={`/product/${item.product_id || item.id}`}>
+                    <Link to={`/product/${productId}`}>
                       <img
                         src={item.image || "https://via.placeholder.com/300"}
                         alt={item.name}
                         className="product-image"
                       />
                     </Link>
+                    {isOutOfStock && (
+                      <div className="product-card-out-of-stock-overlay">
+                        <span>OUT OF STOCK</span>
+                      </div>
+                    )}
                     <button
                       className="wishlist-button active"
-                      onClick={() => handleRemoveFromWishlist(item.product_id || item.id)}
+                      onClick={() => handleRemoveFromWishlist(productId)}
                       title="Remove from wishlist"
                     >
                       <i className="fa fa-times"></i>
@@ -192,20 +211,21 @@ const Wishlist = () => {
                     <button
                       className="quick-add-button"
                       onClick={() => handleAddToCart(item)}
-                      title="Add to Bag"
+                      title={isOutOfStock ? "Out of stock" : "Add to Bag"}
+                      disabled={isOutOfStock}
                     >
                       <i className="fa fa-plus"></i>
                     </button>
                   </div>
                   <div className="product-info">
-                    <Link to={`/product/${item.product_id || item.id}`} className="product-title">
+                    <Link to={`/product/${productId}`} className="product-title">
                       {item.name}
                     </Link>
                     <div className="product-price">₹ {Number(item.price || 0).toLocaleString('en-IN')}</div>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>
@@ -236,6 +256,21 @@ const Wishlist = () => {
           height: 100%;
           object-fit: cover;
           transition: transform 0.3s ease;
+        }
+
+        .product-card-out-of-stock-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          font-size: 12px;
+          font-weight: 500;
+          color: #ffffff;
+          pointer-events: none;
         }
 
         .product-card-zara:hover .product-image {
