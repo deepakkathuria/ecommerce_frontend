@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
 import toast from "react-hot-toast";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 const Product = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const cartState = useSelector((state) => state.handleCart);
   const [product, setProduct] = useState({});
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState("");
@@ -112,6 +113,19 @@ const Product = () => {
     if (!token) {
       toast.error("You need to log in to add items to the cart!");
       navigate("/login");
+      return;
+    }
+
+    // 🚫 Enforce max 1 piece per product
+    const alreadyInCart = cartState.some((item) => item.id === product.id);
+    if (alreadyInCart) {
+      toast((t) => (
+        <span>
+          This piece is <strong>one-of-a-kind</strong> and limited to 1 per customer.
+          <br />
+          For more pieces or custom orders, please DM us on Instagram or WhatsApp.
+        </span>
+      ));
       return;
     }
 

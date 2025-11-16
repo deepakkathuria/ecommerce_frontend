@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../redux/action";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -276,11 +276,26 @@ const Products = () => {
     setSearchTerm("");
   }, []);
 
+  const cartState = useSelector((state) => state.handleCart);
+
   const handleAddToCart = useCallback(async (product) => {
     const token = localStorage.getItem("apitoken");
     if (!token) {
       toast.error("Please login to add items to cart");
       navigate("/login");
+      return;
+    }
+
+    // 🚫 Enforce max 1 piece per product
+    const alreadyInCart = cartState.some((item) => item.id === product.id);
+    if (alreadyInCart) {
+      toast((t) => (
+        <span>
+          This piece is <strong>one-of-a-kind</strong> and limited to 1 per customer.
+          <br />
+          For more pieces or custom orders, please DM us on Instagram or WhatsApp.
+        </span>
+      ));
       return;
     }
 
@@ -323,7 +338,7 @@ const Products = () => {
       console.error("Cart error:", error);
       toast.error(error.message || "Failed to add to cart");
     }
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, cartState]);
 
   const handleToggleWishlist = useCallback(async (product) => {
     const token = localStorage.getItem("apitoken");

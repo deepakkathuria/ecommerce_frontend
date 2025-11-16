@@ -107,20 +107,8 @@ const Cart = () => {
   };
 
   const CartItem = ({ item }) => {
-    const [quantity, setQuantity] = useState(item.qty || 1);
-
-    const updateQuantity = async (newQty) => {
-      if (newQty < 1) return;
-      
-      setQuantity(newQty);
-      const updatedProduct = { ...item, qty: newQty };
-      
-      if (newQty > (item.qty || 1)) {
-        await addItem(updatedProduct);
-      } else if (newQty < (item.qty || 1)) {
-        await removeItem(updatedProduct);
-      }
-    };
+    // Always enforce quantity = 1 for each product
+    const quantity = 1;
 
     return (
       <div className="cart-item-card">
@@ -168,18 +156,7 @@ const Cart = () => {
             <div className="cart-item-controls">
               <div className="quantity-selector">
                 <label>Quantity:</label>
-                <select
-                  value={quantity}
-                  onChange={(e) => updateQuantity(parseInt(e.target.value))}
-                  className="quantity-dropdown"
-                  disabled={isUpdating}
-                >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                    <option key={num} value={num}>
-                      {num}
-                    </option>
-                  ))}
-                </select>
+                <span className="quantity-fixed">1 (one-of-a-kind)</span>
               </div>
             </div>
             
@@ -193,10 +170,11 @@ const Cart = () => {
   };
 
   const ShowCart = () => {
-    const subtotal = state.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0);
+      // Each product is limited to 1 piece
+      const subtotal = state.reduce((acc, item) => acc + item.price, 0);
     const shipping = subtotal >= 1000 ? 0 : 49;
     const total = subtotal + shipping;
-    const totalItems = state.reduce((acc, item) => acc + (item.qty || 1), 0);
+      const totalItems = state.length;
 
     return (
       <div className="cart-container">

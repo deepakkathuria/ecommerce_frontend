@@ -12,8 +12,10 @@ const handleCart = (state = getInitialCart(), action) => {
     case "ADDITEM":
       const exist = state.find((x) => x.id === product.id);
       if (exist) {
+        // 👉 Do NOT allow more than 1 piece per product
+        // Keep quantity at 1 and return the same cart
         updatedCart = state.map((x) =>
-          x.id === product.id ? { ...x, qty: x.qty + 1 } : x
+          x.id === product.id ? { ...x, qty: 1 } : x
         );
       } else {
         updatedCart = [...state, { ...product, qty: 1 }];
