@@ -15,6 +15,7 @@ const Product = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [loading, setLoading] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [showOutOfStockOverlay, setShowOutOfStockOverlay] = useState(false);
   const dispatch = useDispatch();
 
   let touchStartX = 0;
@@ -116,16 +117,10 @@ const Product = () => {
       return;
     }
 
-    // 🚫 Enforce max 1 piece per product
+    // 🚫 Enforce max 1 piece per product: if already in cart, show overlay instead of adding again
     const alreadyInCart = cartState.some((item) => item.id === product.id);
     if (alreadyInCart) {
-      toast((t) => (
-        <span>
-          This piece is <strong>one-of-a-kind</strong> and limited to 1 per customer.
-          <br />
-          For more pieces or custom orders, please DM us on Instagram or WhatsApp.
-        </span>
-      ));
+      setShowOutOfStockOverlay(true);
       return;
     }
 
@@ -257,6 +252,11 @@ const Product = () => {
                 onTouchEnd={handleTouchEnd}
                 loading="lazy"
               />
+              {showOutOfStockOverlay && (
+                <div className="product-out-of-stock-overlay">
+                  <span>OUT OF STOCK</span>
+                </div>
+              )}
             </div>
             
             {/* Thumbnails */}
@@ -303,8 +303,9 @@ const Product = () => {
             <button
               className="product-add-btn"
               onClick={() => addProductToCart(product)}
+              disabled={showOutOfStockOverlay}
             >
-              ADD
+              {showOutOfStockOverlay ? "OUT OF STOCK" : "ADD"}
             </button>
 
             <div className="product-description">
@@ -357,6 +358,7 @@ const Product = () => {
           min-height: 500px;
           margin-bottom: 12px;
           padding-top: 0;
+          position: relative;
         }
 
         .product-main-image {
@@ -366,6 +368,20 @@ const Product = () => {
           width: auto;
           height: auto;
           margin-top: 0;
+        }
+
+        .product-out-of-stock-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          font-size: 16px;
+          font-weight: 500;
+          color: #ffffff;
         }
 
         .product-thumbnails {
