@@ -86,6 +86,7 @@ const Wishlist = () => {
         const stockQuantity = item.stock_quantity || 1;
         const currentCartQty = cartItem ? (cartItem.qty || 1) : 0;
         
+        // Show OUT OF STOCK if cart quantity already equals or exceeds stock
         if (currentCartQty >= stockQuantity) {
           outOfStockItems[productId] = true;
         }
@@ -134,12 +135,13 @@ const Wishlist = () => {
 
     const productId = item.product_id || item.id;
 
-    // 🚫 Check stock_quantity: if cart quantity >= stock_quantity, show OUT OF STOCK
+    // 🚫 Check stock_quantity: if adding 1 more would exceed stock, show OUT OF STOCK
     const existingCartItem = cartState.find((cartItem) => cartItem.id === productId);
     const stockQuantity = item.stock_quantity || 1;
     const currentCartQty = existingCartItem ? (existingCartItem.qty || 1) : 0;
+    const newQtyAfterAdd = currentCartQty + 1; // Quantity after adding 1 more
     
-    if (currentCartQty >= stockQuantity) {
+    if (newQtyAfterAdd > stockQuantity) {
       setOutOfStockMap((prev) => ({ ...prev, [productId]: true }));
       toast.error("OUT OF STOCK");
       return;
@@ -179,6 +181,28 @@ const Wishlist = () => {
       };
 
       dispatch(addCart(productWithCategory));
+      
+      // ✅ Clear OUT OF STOCK overlay for this item after successful add
+      setOutOfStockMap((prev) => {
+        const updated = { ...prev };
+        delete updated[productId];
+        return updated;
+      });
+      
+      // ✅ Sync cart from backend to get latest state
+      const syncCartFromBackend = async () => {
+        try {
+          const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await response.json();
+          dispatch(syncCart(data.cartItems || []));
+        } catch (err) {
+          console.error("Failed to sync cart:", err);
+        }
+      };
+      syncCartFromBackend();
+      
       toast.success("Added to cart!");
     } catch (error) {
       console.error("Cart error:", error);
