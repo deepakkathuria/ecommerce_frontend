@@ -37,6 +37,15 @@ const Cart = () => {
     setIsUpdating(true);
     try {
       await dispatch(addCart(product));
+      // ✅ Cart is already synced in addCart action, but refresh to get latest from backend
+      const token = localStorage.getItem("apitoken");
+      if (token) {
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        dispatch(syncCart(data.cartItems || []));
+      }
     } catch (error) {
       toast.error("Failed to add item");
     } finally {
@@ -48,6 +57,17 @@ const Cart = () => {
     setIsUpdating(true);
     try {
       await dispatch(delCart(product));
+      
+      // ✅ Cart is already synced in delCart action, but refresh to get latest from backend
+      const token = localStorage.getItem("apitoken");
+      if (token) {
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        dispatch(syncCart(data.cartItems || []));
+      }
+      
       toast.success("Item removed from cart!");
     } catch (error) {
       toast.error("Failed to remove item");

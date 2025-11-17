@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addCart } from "../redux/action";
+import { addCart, syncCart } from "../redux/action";
 import { Navbar, Footer } from "../components";
 import toast from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
@@ -56,7 +56,25 @@ const Wishlist = () => {
 
   useEffect(() => {
     fetchWishlist();
-  }, []);
+    
+    // ✅ Sync cart from backend when wishlist page loads
+    const syncCartFromBackend = async () => {
+      const token = localStorage.getItem("apitoken");
+      if (!token) return;
+      
+      try {
+        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        dispatch(syncCart(data.cartItems || []));
+      } catch (err) {
+        console.error("Failed to sync cart:", err);
+      }
+    };
+    
+    syncCartFromBackend();
+  }, [dispatch]);
 
   // ✅ Update outOfStockMap when cart or wishlist changes
   useEffect(() => {
