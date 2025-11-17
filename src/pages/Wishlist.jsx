@@ -98,9 +98,12 @@ const Wishlist = () => {
 
     const productId = item.product_id || item.id;
 
-    // If item is already in cart, show OUT OF STOCK overlay on this wishlist card
-    const alreadyInCart = cartState.some((cartItem) => cartItem.id === productId);
-    if (alreadyInCart) {
+    // 🚫 Check stock_quantity: if cart quantity >= stock_quantity, show OUT OF STOCK
+    const cartItem = cartState.find((cartItem) => cartItem.id === productId);
+    const stockQuantity = item.stock_quantity || 1;
+    const currentCartQty = cartItem ? (cartItem.qty || 1) : 0;
+    
+    if (currentCartQty >= stockQuantity) {
       setOutOfStockMap((prev) => ({ ...prev, [productId]: true }));
       toast.error("OUT OF STOCK");
       return;

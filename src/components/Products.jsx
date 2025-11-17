@@ -138,6 +138,7 @@ const Products = () => {
             category: item.category?.toLowerCase() || "uncategorized",
             subcategory: item.subcategory?.toLowerCase() || "",
             images: images.length > 0 ? images : ["https://via.placeholder.com/150"],
+            stock_quantity: item.stock_quantity || 1,
           };
         });
 
@@ -286,11 +287,14 @@ const Products = () => {
       return "no-auth";
     }
 
-    // 🚫 Enforce max 1 piece per product
-    const alreadyInCart = cartState.some((item) => item.id === product.id);
-    if (alreadyInCart) {
+    // 🚫 Check stock_quantity: if cart quantity >= stock_quantity, show OUT OF STOCK
+    const existingCartItem = cartState.find((item) => item.id === product.id);
+    const stockQuantity = product.stock_quantity || 1;
+    const currentCartQty = existingCartItem ? (existingCartItem.qty || 1) : 0;
+    
+    if (currentCartQty >= stockQuantity) {
       toast.error("OUT OF STOCK");
-      // Indicate to the caller that this product is already present
+      // Indicate to the caller that this product is out of stock
       return "already-in-cart";
     }
 

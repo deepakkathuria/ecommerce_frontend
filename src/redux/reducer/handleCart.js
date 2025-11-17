@@ -12,9 +12,9 @@ const handleCart = (state = getInitialCart(), action) => {
     case "ADDITEM":
       const exist = state.find((x) => x.id === product.id);
       if (exist) {
-        // Max quantity is 1 - keep at 1 if already exists
+        // Allow increasing quantity (stock check is done in component)
         updatedCart = state.map((x) =>
-          x.id === product.id ? { ...x, qty: 1 } : x
+          x.id === product.id ? { ...x, qty: (x.qty || 1) + 1 } : x
         );
       } else {
         updatedCart = [...state, { ...product, qty: 1 }];

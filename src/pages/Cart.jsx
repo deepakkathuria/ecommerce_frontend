@@ -109,15 +109,33 @@ const Cart = () => {
   const CartItem = ({ item }) => {
     const quantity = item.qty || 1;
     const [showOutOfStock, setShowOutOfStock] = useState(false);
+    const [stockQuantity, setStockQuantity] = useState(item.stock_quantity || 1);
+
+    // Fetch stock_quantity from product API
+    useEffect(() => {
+      const fetchStock = async () => {
+        try {
+          const response = await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/product/${item.id}`);
+          const result = await response.json();
+          if (result.status === 200 && result.rows.length > 0) {
+            setStockQuantity(result.rows[0].stock_quantity || 1);
+          }
+        } catch (error) {
+          console.error("Error fetching stock:", error);
+        }
+      };
+      fetchStock();
+    }, [item.id]);
 
     const handleIncreaseQuantity = async () => {
-      // If quantity is already 1, show OUT OF STOCK and don't increase
-      if (quantity >= 1) {
+      // Check if current quantity >= stock_quantity
+      if (quantity >= stockQuantity) {
         setShowOutOfStock(true);
         toast.error("OUT OF STOCK");
         return;
       }
       await addItem(item);
+      setShowOutOfStock(false);
     };
 
     const handleDecreaseQuantity = async () => {

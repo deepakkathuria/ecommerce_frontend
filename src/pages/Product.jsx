@@ -117,9 +117,12 @@ const Product = () => {
       return;
     }
 
-    // 🚫 Enforce max 1 piece per product: if already in cart, show overlay and notification
-    const alreadyInCart = cartState.some((item) => item.id === product.id);
-    if (alreadyInCart) {
+    // 🚫 Check stock_quantity: if cart quantity >= stock_quantity, show OUT OF STOCK
+    const existingCartItem = cartState.find((item) => item.id === product.id);
+    const stockQuantity = product.stock_quantity || 1;
+    const currentCartQty = existingCartItem ? (existingCartItem.qty || 1) : 0;
+    
+    if (currentCartQty >= stockQuantity) {
       setShowOutOfStockOverlay(true);
       toast.error("OUT OF STOCK");
       return;
@@ -200,6 +203,7 @@ const Product = () => {
             category: productData.category || "Uncategorized",
             subcategory: productData.subcategory || "",
             code: productData.item_id || id,
+            stock_quantity: productData.stock_quantity || 1,
           });
 
           setImages(productImages);
