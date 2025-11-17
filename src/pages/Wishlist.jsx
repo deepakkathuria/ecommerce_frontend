@@ -85,9 +85,10 @@ const Wishlist = () => {
         const cartItem = cartState.find((cartItem) => cartItem.id === productId);
         const stockQuantity = item.stock_quantity || 1;
         const currentCartQty = cartItem ? (cartItem.qty || 1) : 0;
+        const newQtyAfterAdd = currentCartQty + 1; // Quantity after adding 1 more from wishlist
         
-        // Show OUT OF STOCK if cart quantity already equals or exceeds stock
-        if (currentCartQty >= stockQuantity) {
+        // Show OUT OF STOCK only if adding 1 more would exceed stock
+        if (newQtyAfterAdd > stockQuantity) {
           outOfStockItems[productId] = true;
         }
       });
