@@ -102,6 +102,7 @@ const Wishlist = () => {
     const alreadyInCart = cartState.some((cartItem) => cartItem.id === productId);
     if (alreadyInCart) {
       setOutOfStockMap((prev) => ({ ...prev, [productId]: true }));
+      toast.error("OUT OF STOCK");
       return;
     }
 

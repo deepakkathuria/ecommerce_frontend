@@ -108,9 +108,23 @@ const Cart = () => {
 
   const CartItem = ({ item }) => {
     const quantity = item.qty || 1;
+    const [showOutOfStock, setShowOutOfStock] = useState(false);
 
     const handleIncreaseQuantity = async () => {
+      // If quantity is already 1, show OUT OF STOCK and don't increase
+      if (quantity >= 1) {
+        setShowOutOfStock(true);
+        toast.error("OUT OF STOCK");
+        return;
+      }
       await addItem(item);
+    };
+
+    const handleDecreaseQuantity = async () => {
+      if (quantity > 1) {
+        await removeItem(item);
+        setShowOutOfStock(false);
+      }
     };
 
     return (
@@ -146,6 +160,11 @@ const Cart = () => {
                 className="cart-item-image"
               />
             </Link>
+            {showOutOfStock && (
+              <div className="cart-item-out-of-stock-overlay">
+                <span>OUT OF STOCK</span>
+              </div>
+            )}
           </div>
           
           <div className="cart-item-details">
@@ -159,6 +178,14 @@ const Cart = () => {
             <div className="cart-item-controls">
               <div className="quantity-selector">
                 <label>Quantity:</label>
+                <button
+                  className="quantity-minus-btn"
+                  onClick={handleDecreaseQuantity}
+                  disabled={isUpdating || quantity <= 1}
+                  title="Decrease quantity"
+                >
+                  <i className="fa fa-minus"></i>
+                </button>
                 <span className="quantity-fixed">{quantity}</span>
                 <button
                   className="quantity-plus-btn"
@@ -381,6 +408,7 @@ const Cart = () => {
         }
 
         .cart-item-image-wrapper {
+          position: relative;
           width: 120px;
           height: 160px;
           flex-shrink: 0;
@@ -392,6 +420,21 @@ const Cart = () => {
           width: 100%;
           height: 100%;
           object-fit: contain;
+        }
+
+        .cart-item-out-of-stock-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          font-size: 12px;
+          font-weight: 500;
+          color: #ffffff;
+          z-index: 10;
         }
 
         .cart-item-details {
@@ -446,9 +489,11 @@ const Cart = () => {
           font-size: 14px;
           color: #282c3f;
           font-weight: 500;
-          min-width: 20px;
+          min-width: 30px;
+          text-align: center;
         }
 
+        .quantity-minus-btn,
         .quantity-plus-btn {
           background: #000;
           color: #fff;
@@ -464,10 +509,12 @@ const Cart = () => {
           font-size: 12px;
         }
 
+        .quantity-minus-btn:hover,
         .quantity-plus-btn:hover {
           background: #333;
         }
 
+        .quantity-minus-btn:disabled,
         .quantity-plus-btn:disabled {
           background: #d4d5d9;
           cursor: not-allowed;
