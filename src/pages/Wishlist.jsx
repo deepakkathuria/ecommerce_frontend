@@ -58,6 +58,24 @@ const Wishlist = () => {
     fetchWishlist();
   }, []);
 
+  // ✅ Update outOfStockMap when cart or wishlist changes
+  useEffect(() => {
+    if (wishlist.length > 0) {
+      const outOfStockItems = {};
+      wishlist.forEach((item) => {
+        const productId = item.product_id || item.id;
+        const cartItem = cartState.find((cartItem) => cartItem.id === productId);
+        const stockQuantity = item.stock_quantity || 1;
+        const currentCartQty = cartItem ? (cartItem.qty || 1) : 0;
+        
+        if (currentCartQty >= stockQuantity) {
+          outOfStockItems[productId] = true;
+        }
+      });
+      setOutOfStockMap(outOfStockItems);
+    }
+  }, [cartState, wishlist]);
+
   const handleRemoveFromWishlist = async (productId) => {
     const token = localStorage.getItem("apitoken");
     if (!token) return;
@@ -99,9 +117,9 @@ const Wishlist = () => {
     const productId = item.product_id || item.id;
 
     // 🚫 Check stock_quantity: if cart quantity >= stock_quantity, show OUT OF STOCK
-    const cartItem = cartState.find((cartItem) => cartItem.id === productId);
+    const existingCartItem = cartState.find((cartItem) => cartItem.id === productId);
     const stockQuantity = item.stock_quantity || 1;
-    const currentCartQty = cartItem ? (cartItem.qty || 1) : 0;
+    const currentCartQty = existingCartItem ? (existingCartItem.qty || 1) : 0;
     
     if (currentCartQty >= stockQuantity) {
       setOutOfStockMap((prev) => ({ ...prev, [productId]: true }));
@@ -110,7 +128,7 @@ const Wishlist = () => {
     }
 
     try {
-      const cartItem = {
+      const cartItemPayload = {
         items: [{
           id: productId,
           quantity: 1,
@@ -126,7 +144,7 @@ const Wishlist = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(cartItem),
+          body: JSON.stringify(cartItemPayload),
       });
 
       if (!response.ok) {
@@ -275,6 +293,7 @@ const Wishlist = () => {
           font-weight: 500;
           color: #ffffff;
           pointer-events: none;
+          z-index: 5;
         }
 
         .product-card-zara:hover .product-image {
