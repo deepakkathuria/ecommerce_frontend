@@ -56,21 +56,22 @@ const Cart = () => {
   const removeItem = async (product) => {
     setIsUpdating(true);
     try {
+      // ✅ Check if item will be completely removed (qty === 1) before dispatching
+      const existingItem = state.find(item => item.id === product.id);
+      const willBeRemoved = existingItem && existingItem.qty === 1;
+      
+      // ✅ delCart already updates backend, so we don't need to sync immediately
+      // The Redux state is updated locally, which is correct
       await dispatch(delCart(product));
       
-      // ✅ Cart is already synced in delCart action, but refresh to get latest from backend
-      const token = localStorage.getItem("apitoken");
-      if (token) {
-        const response = await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
-        dispatch(syncCart(data.cartItems || []));
+      // ✅ Show appropriate message
+      if (willBeRemoved) {
+        toast.success("Item removed from cart!");
+      } else {
+        toast.success("Quantity decreased");
       }
-      
-      toast.success("Item removed from cart!");
     } catch (error) {
-      toast.error("Failed to remove item");
+      toast.error("Failed to update quantity");
     } finally {
       setIsUpdating(false);
     }

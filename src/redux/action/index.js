@@ -39,24 +39,41 @@ export const addCart = (product) => async (dispatch, getState) => {
     try {
       const token = localStorage.getItem("apitoken");
       const state = getState().handleCart;
-  
+
       // Find the item to check its quantity
       const existingItem = state.find(item => item.id === product.id);
       
       if (existingItem && existingItem.qty > 1) {
         // Decrease quantity
-        const updatedCart = state.map((item) =>
-          item.id === product.id ? { ...item, qty: item.qty - 1 } : item
-        );
+        // Backend /cart/add ADDS to existing quantity, so we need to:
+        // 1. Remove the item first
+        // 2. Then add it back with the new quantity
+        const newQuantity = existingItem.qty - 1;
         
-        // Update backend with new cart state
+        // First, remove the item
+        await fetch(`https://hammerhead-app-jkdit.ondigitalocean.app/cart/remove/${product.id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        // Then add it back with the new quantity
+        const itemToAdd = {
+          id: product.id,
+          quantity: newQuantity,
+          name: existingItem.name || product.name,
+          price: existingItem.price || product.price,
+          image: existingItem.image || product.image,
+        };
+        
         await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ items: updatedCart }),
+          body: JSON.stringify({ items: [itemToAdd] }),
         });
       } else {
         // Remove item completely
@@ -67,7 +84,7 @@ export const addCart = (product) => async (dispatch, getState) => {
           },
         });
       }
-  
+
       dispatch({ type: "DELITEM", payload: product });
     } catch (err) {
       console.error("Error removing from cart:", err);
