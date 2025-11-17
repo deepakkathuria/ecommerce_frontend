@@ -155,8 +155,7 @@ const Cart = () => {
             
             <div className="cart-item-controls">
               <div className="quantity-selector">
-                <label>Quantity:</label>
-                <span className="quantity-fixed">1 (one-of-a-kind)</span>
+                <span className="quantity-fixed">1</span>
               </div>
             </div>
             
