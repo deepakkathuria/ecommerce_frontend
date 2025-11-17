@@ -149,8 +149,9 @@ const Cart = () => {
     }, [item.id]);
 
     const handleIncreaseQuantity = async () => {
-      // Check if current quantity >= stock_quantity
-      if (quantity >= stockQuantity) {
+      // Check if adding 1 more would exceed stock
+      const newQty = quantity + 1;
+      if (newQty > stockQuantity) {
         setShowOutOfStock(true);
         toast.error("OUT OF STOCK");
         return;

@@ -18,14 +18,22 @@ export const addCart = (product) => async (dispatch, getState) => {
         updatedCart = [...state, { ...product, qty: 1 }];
       }
   
-      // Sync with backend
+      // Sync with backend - send items with quantity field
+      const itemsToSend = updatedCart.map(item => ({
+        id: item.id,
+        quantity: item.qty || 1,
+        name: item.name || item.title,
+        price: item.price,
+        image: item.image || (item.images && item.images[0]) || '',
+      }));
+      
       await fetch("https://hammerhead-app-jkdit.ondigitalocean.app/cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ items: updatedCart }),
+        body: JSON.stringify({ items: itemsToSend }),
       });
   
       dispatch({ type: "ADDITEM", payload: product });
