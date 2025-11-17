@@ -289,7 +289,7 @@ const Products = () => {
     // 🚫 Enforce max 1 piece per product
     const alreadyInCart = cartState.some((item) => item.id === product.id);
     if (alreadyInCart) {
-      toast.error("This item is already in your bag");
+      toast.error("OUT OF STOCK");
       // Indicate to the caller that this product is already present
       return "already-in-cart";
     }

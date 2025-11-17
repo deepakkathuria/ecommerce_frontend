@@ -107,7 +107,11 @@ const Cart = () => {
   };
 
   const CartItem = ({ item }) => {
-    const quantity = 1;
+    const quantity = item.qty || 1;
+
+    const handleIncreaseQuantity = async () => {
+      await addItem(item);
+    };
 
     return (
       <div className="cart-item-card">
@@ -155,7 +159,15 @@ const Cart = () => {
             <div className="cart-item-controls">
               <div className="quantity-selector">
                 <label>Quantity:</label>
-                <span className="quantity-fixed">1</span>
+                <span className="quantity-fixed">{quantity}</span>
+                <button
+                  className="quantity-plus-btn"
+                  onClick={handleIncreaseQuantity}
+                  disabled={isUpdating}
+                  title="Increase quantity"
+                >
+                  <i className="fa fa-plus"></i>
+                </button>
               </div>
             </div>
             
@@ -169,10 +181,10 @@ const Cart = () => {
   };
 
   const ShowCart = () => {
-    const subtotal = state.reduce((acc, item) => acc + item.price, 0);
+    const subtotal = state.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0);
     const shipping = subtotal >= 1000 ? 0 : 49;
     const total = subtotal + shipping;
-    const totalItems = state.length;
+    const totalItems = state.reduce((acc, item) => acc + (item.qty || 1), 0);
 
     return (
       <div className="cart-container">
@@ -428,6 +440,37 @@ const Cart = () => {
           font-size: 14px;
           color: #282c3f;
           font-weight: 500;
+        }
+
+        .quantity-fixed {
+          font-size: 14px;
+          color: #282c3f;
+          font-weight: 500;
+          min-width: 20px;
+        }
+
+        .quantity-plus-btn {
+          background: #000;
+          color: #fff;
+          border: none;
+          width: 28px;
+          height: 28px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: background 0.2s ease;
+          font-size: 12px;
+        }
+
+        .quantity-plus-btn:hover {
+          background: #333;
+        }
+
+        .quantity-plus-btn:disabled {
+          background: #d4d5d9;
+          cursor: not-allowed;
         }
 
         .quantity-dropdown {

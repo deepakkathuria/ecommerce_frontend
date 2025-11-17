@@ -121,7 +121,7 @@ const Product = () => {
     const alreadyInCart = cartState.some((item) => item.id === product.id);
     if (alreadyInCart) {
       setShowOutOfStockOverlay(true);
-      toast.error("This item is already in your bag");
+      toast.error("OUT OF STOCK");
       return;
     }
 
