@@ -117,10 +117,11 @@ const Product = () => {
       return;
     }
 
-    // 🚫 Enforce max 1 piece per product: if already in cart, show overlay instead of adding again
+    // 🚫 Enforce max 1 piece per product: if already in cart, show overlay and notification
     const alreadyInCart = cartState.some((item) => item.id === product.id);
     if (alreadyInCart) {
       setShowOutOfStockOverlay(true);
+      toast.error("This item is already in your bag");
       return;
     }
 

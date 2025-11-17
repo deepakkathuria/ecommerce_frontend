@@ -11,9 +11,9 @@ const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [outOfStockMap, setOutOfStockMap] = useState({});
+  const cartState = useSelector((state) => state.handleCart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const cartState = useSelector((state) => state.handleCart);
 
   const fetchWishlist = async () => {
     const token = localStorage.getItem("apitoken");
@@ -102,6 +102,7 @@ const Wishlist = () => {
     const alreadyInCart = cartState.some((cartItem) => cartItem.id === productId);
     if (alreadyInCart) {
       setOutOfStockMap((prev) => ({ ...prev, [productId]: true }));
+      toast.error("This item is already in your bag");
       return;
     }
 
