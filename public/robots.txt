@@ -10,4 +10,4 @@ Disallow: /register
 Disallow: /invoice/
 
 # Sitemap
-Sitemap: https://reactjs-ecommerce-app.vercel.app/sitemap.xml
+Sitemap: https://zairi.in/sitemap.xml

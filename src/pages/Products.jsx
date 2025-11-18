@@ -29,7 +29,7 @@ const Products = () => {
         title={title}
         description={description}
         keywords={keywords}
-        url={`https://reactjs-ecommerce-app.vercel.app/product${category ? `?category=${category}` : ''}${subcategory ? `&subcategory=${subcategory}` : ''}`}
+        url={`https://zairi.in/product${category ? `?category=${category}` : ''}${subcategory ? `&subcategory=${subcategory}` : ''}`}
         category={category}
       />
       <Navbar />

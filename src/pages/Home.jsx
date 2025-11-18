@@ -9,7 +9,7 @@ function Home() {
         title="Zairi - Premium Jewelry & Antiques Collection"
         description="Discover exquisite jewelry, antiques, and unique collectibles at Zairi. Handpicked premium pieces for every story. Shop authentic vintage jewelry and antique collectibles online."
         keywords="jewelry, antiques, vintage jewelry, antique jewelry, collectibles, premium jewelry, handmade jewelry, unique jewelry, jewelry store, antique store, vintage collectibles, jewelry online, buy jewelry, jewelry shop, antique shop"
-        url="https://reactjs-ecommerce-app.vercel.app"
+        url="https://zairi.in"
       />
       <Navbar />
       <Main />

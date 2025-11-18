@@ -6,7 +6,7 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/</loc>
+    <loc>https://zairi.in/</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
   
   <!-- Products Listing -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/product</loc>
+    <loc>https://zairi.in/product</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
   
   <!-- About Page -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/about</loc>
+    <loc>https://zairi.in/about</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -30,7 +30,7 @@
   
   <!-- Contact Page -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/contact</loc>
+    <loc>https://zairi.in/contact</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -38,7 +38,7 @@
   
   <!-- Blog -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/blog</loc>
+    <loc>https://zairi.in/blog</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -46,7 +46,7 @@
   
   <!-- Privacy Policy -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/privacy-policy</loc>
+    <loc>https://zairi.in/privacy-policy</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -54,7 +54,7 @@
   
   <!-- Return Policy -->
   <url>
-    <loc>https://reactjs-ecommerce-app.vercel.app/return-policy</loc>
+    <loc>https://zairi.in/return-policy</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>

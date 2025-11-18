@@ -325,7 +325,7 @@ const Product = () => {
 
   // Prepare product data for SEO
   const productImage = selectedImage || images[0] || "https://i.ibb.co/fQ293tm/image.png";
-  const productUrl = `https://reactjs-ecommerce-app.vercel.app/product/${id}`;
+  const productUrl = `https://zairi.in/product/${id}`;
   const productDescription = product.description 
     ? `${product.description.substring(0, 160)}...` 
     : `Buy ${product.title || "Premium Jewelry"} at Zairi. Premium quality jewelry and antiques collection.`;
