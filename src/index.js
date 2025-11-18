@@ -29,6 +29,7 @@ const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 
 // ✅ Component to Fetch Cart on Load
 const FetchCartOnLoad = () => {
@@ -99,6 +100,13 @@ root.render(
               <Route path="/return-policy" element={<ReturnPolicy />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+
+              {/* SEO Category Pages - Flexible system (add new categories in categoryConfigs.js) */}
+              <Route path="/anti-tarnish-jewellery" element={<CategoryPage />} />
+              <Route path="/artificial-jewellery" element={<CategoryPage />} />
+              <Route path="/korean-jewellery" element={<CategoryPage />} />
+              <Route path="/brass-jewellery" element={<CategoryPage />} />
+              <Route path="/accessories" element={<CategoryPage />} />
 
               {/* Catch-All Route */}
               <Route path="*" element={<PageNotFound />} />

@@ -2,6 +2,7 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { blogHighlights } from "../data/blogHighlights";
 import { Navbar, Footer } from "../components";
+import SEO from "../components/SEO";
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -22,8 +23,23 @@ const BlogPost = () => {
     );
   }
 
+  // SEO for blog post
+  const blogTitle = post.title;
+  const blogDescription = post.excerpt;
+  const blogUrl = `https://zairi.in${post.slug}`;
+  const blogKeywords = post.slug.includes('anti-tarnish') 
+    ? "anti tarnish jewellery, anti tarnish jewellery india, anti tarnish jewellery online, what is anti tarnish jewellery, anti tarnish jewellery benefits, best anti tarnish jewellery"
+    : "jewelry care, jewelry maintenance, jewelry tips, jewelry guide";
+
   return (
     <>
+      <SEO
+        title={`${blogTitle} | Zairi Blog`}
+        description={blogDescription}
+        keywords={blogKeywords}
+        url={blogUrl}
+        type="article"
+      />
       <Navbar />
       <div className="container py-5 blog-post-container">
         <Link to="/blog" className="blog-back-link">← Back to Journal</Link>
