@@ -4,6 +4,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
+import SEO from "../components/SEO";
 import toast from "react-hot-toast";
 
 const Product = () => {
@@ -322,8 +323,33 @@ const Product = () => {
     );
   };
 
+  // Prepare product data for SEO
+  const productImage = selectedImage || images[0] || "https://i.ibb.co/fQ293tm/image.png";
+  const productUrl = `https://reactjs-ecommerce-app.vercel.app/product/${id}`;
+  const productDescription = product.description 
+    ? `${product.description.substring(0, 160)}...` 
+    : `Buy ${product.title || "Premium Jewelry"} at Zairi. Premium quality jewelry and antiques collection.`;
+
   return (
     <>
+      <SEO
+        title={product.title || "Premium Jewelry | Zairi"}
+        description={productDescription}
+        keywords={`${product.title}, jewelry, ${product.category || "premium jewelry"}, antiques, buy jewelry online, ${product.subcategory || ""}`}
+        image={productImage}
+        url={productUrl}
+        type="product"
+        product={{
+          id: product.id,
+          name: product.title,
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          image: productImage,
+          images: images,
+          stock_quantity: product.stock_quantity,
+        }}
+      />
       <Navbar />
       {loading ? (
         <div className="container my-5">

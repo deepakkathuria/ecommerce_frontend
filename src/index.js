@@ -6,6 +6,7 @@ import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import { Toaster } from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 import ScrollToTop from "./components/ScrollToTop";
 import { syncCart } from "./redux/action";
 import store from "./redux/store";
@@ -66,44 +67,46 @@ const PageLoader = () => (
 // ✅ Include FetchCartOnLoad inside Provider
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter>
-    <ScrollToTop>
-      <Provider store={store}>
-        <FetchCartOnLoad /> {/* ✅ Fetch cart on load */}
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Main Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/checkout" element={<Checkout />} />
+  <HelmetProvider>
+    <BrowserRouter>
+      <ScrollToTop>
+        <Provider store={store}>
+          <FetchCartOnLoad /> {/* ✅ Fetch cart on load */}
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Main Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/checkout" element={<Checkout />} />
 
-            {/* Product Routes */}
-            <Route path="/product" element={<Products />} />
-            <Route path="/product/:id" element={<Product />} />
-            <Route path="/product/*" element={<PageNotFound />} /> {/* Handle unknown product routes */}
+              {/* Product Routes */}
+              <Route path="/product" element={<Products />} />
+              <Route path="/product/:id" element={<Product />} />
+              <Route path="/product/*" element={<PageNotFound />} /> {/* Handle unknown product routes */}
 
-            {/* Profile & Order Routes */}
-            <Route path="/profile/*" element={<Profile />} />
-            <Route path="/profile/orders/:orderId" element={<OrderDetails />} />
+              {/* Profile & Order Routes */}
+              <Route path="/profile/*" element={<Profile />} />
+              <Route path="/profile/orders/:orderId" element={<OrderDetails />} />
 
-            <Route path="/invoice/:orderId" element={<InvoicePage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/invoice/:orderId" element={<InvoicePage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-            <Route path="/return-policy" element={<ReturnPolicy />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/return-policy" element={<ReturnPolicy />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
 
-            {/* Catch-All Route */}
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
-        </Suspense>
-      </Provider>
-    </ScrollToTop>
-    <Toaster />
-  </BrowserRouter>
+              {/* Catch-All Route */}
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </Suspense>
+        </Provider>
+      </ScrollToTop>
+      <Toaster />
+    </BrowserRouter>
+  </HelmetProvider>
 );
