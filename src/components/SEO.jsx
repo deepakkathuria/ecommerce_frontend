@@ -134,7 +134,8 @@ const SEO = ({
       {/* Additional SEO */}
       <meta name="geo.region" content="IN" />
       <meta name="geo.placename" content="India" />
-      <link rel="canonical" href={url} />
+      {/* ✅ Canonical URL - Always use non-www zairi.in */}
+      <link rel="canonical" href={url.replace('www.', '').replace('reactjs-ecommerce-app.vercel.app', 'zairi.in')} />
 
       {/* Structured Data - JSON-LD */}
       {productStructuredData && (

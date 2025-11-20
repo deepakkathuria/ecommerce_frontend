@@ -30,7 +30,7 @@
 ### Step 1: Google Search Console mein add karo
 1. https://search.google.com/search-console par jao
 2. "Add Property" click karo
-3. Website URL add karo: `https://reactjs-ecommerce-app.vercel.app`
+3. Website URL add karo: `https://zairi.in` (ya `https://www.zairi.in`)
 4. Verification method choose karo (HTML tag ya DNS)
 
 ### Step 2: Sitemap Submit karo
@@ -76,17 +76,22 @@
 ## 🔍 Current Status Check
 
 ### Test URLs:
-- Homepage: https://reactjs-ecommerce-app.vercel.app/
-- Products: https://reactjs-ecommerce-app.vercel.app/product
-- Product Detail: https://reactjs-ecommerce-app.vercel.app/product/[id]
+- Homepage: https://zairi.in/
+- Products: https://zairi.in/product
+- Product Detail: https://zairi.in/product/[slug]
+- Category Pages: 
+  - https://zairi.in/artificial-jewellery
+  - https://zairi.in/anti-tarnish-jewellery
+  - https://zairi.in/korean-jewellery
+  - https://zairi.in/brass-jewellery
 
 ### Quick Test Commands:
 ```bash
 # Check if sitemap is accessible
-curl https://reactjs-ecommerce-app.vercel.app/sitemap.xml
+curl https://zairi.in/sitemap.xml
 
 # Check robots.txt
-curl https://reactjs-ecommerce-app.vercel.app/robots.txt
+curl https://zairi.in/robots.txt
 ```
 
 ## ⚠️ Important Notes
