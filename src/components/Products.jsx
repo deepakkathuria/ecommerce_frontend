@@ -68,6 +68,14 @@ const Products = () => {
     }
   }, [location.search]);
 
+  // ✅ Check if we're coming back from product detail (on mount)
+  useEffect(() => {
+    const shouldRestore = sessionStorage.getItem('scrollRestore') === 'true';
+    if (shouldRestore) {
+      console.log('🔄 Products page mounted - scroll restore flag detected');
+    }
+  }, []);
+
   // Memoized filtered data for better performance
   const filteredData = useMemo(() => {
     let filtered = [...originalData];
@@ -143,9 +151,66 @@ const Products = () => {
 
   const wishlistIdSet = useMemo(() => new Set(wishlistIds), [wishlistIds]);
 
+  // ✅ Save scroll position before navigating to product detail
+  const handleProductClick = useCallback(() => {
+    const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+    console.log('💾 Saving scroll position:', currentScroll);
+    sessionStorage.setItem('productsScrollPosition', currentScroll.toString());
+    sessionStorage.setItem('scrollRestore', 'true');
+    console.log('💾 Saved to sessionStorage:', {
+      productsScrollPosition: currentScroll,
+      scrollRestore: 'true'
+    });
+  }, []);
+
   useEffect(() => {
     setFilter(filteredData);
   }, [filteredData]);
+
+  // ✅ Restore scroll position when coming back from product detail page (FAST)
+  useEffect(() => {
+    const shouldRestoreScroll = sessionStorage.getItem('scrollRestore') === 'true';
+    const savedScrollPosition = sessionStorage.getItem('productsScrollPosition');
+    
+    if (shouldRestoreScroll && savedScrollPosition && !loading && filteredData.length > 0) {
+      const scrollY = parseInt(savedScrollPosition, 10);
+      console.log('⚡ FAST Scroll Restore to:', scrollY);
+      
+      // ✅ Fast restoration - try immediately, then retry if needed
+      const restoreScroll = () => {
+        const docHeight = document.documentElement.scrollHeight;
+        
+        if (scrollY > 0 && scrollY < docHeight) {
+          window.scrollTo({
+            top: scrollY,
+            behavior: 'auto'
+          });
+          
+          // Quick verify and retry if needed
+          setTimeout(() => {
+            const actualScroll = window.scrollY || window.pageYOffset;
+            const diff = Math.abs(actualScroll - scrollY);
+            
+            if (diff > 50) {
+              // Retry once more quickly
+              window.scrollTo({ top: scrollY, behavior: 'auto' });
+            }
+            
+            // Clear flags
+            sessionStorage.removeItem('scrollRestore');
+            sessionStorage.removeItem('productsScrollPosition');
+            console.log('✅ Scroll restored! Position:', window.scrollY);
+          }, 50);
+        } else {
+          // DOM not ready yet, retry quickly
+          setTimeout(restoreScroll, 100);
+        }
+      };
+      
+      // ✅ Start immediately, no delay
+      restoreScroll();
+    }
+  }, [loading, filteredData.length]);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -689,6 +754,7 @@ const Products = () => {
             isWishlisted={wishlistIdSet.has(normalizeId(product.id))}
             onToggleWishlist={handleToggleWishlist}
             onQuickAdd={handleAddToCart}
+            onProductClick={handleProductClick}
           />
         ))}
       </div>
@@ -1239,7 +1305,7 @@ const Products = () => {
   );
 };
 
-const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, onQuickAdd }) => {
+const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, onQuickAdd, onProductClick }) => {
   const [currentImage, setCurrentImage] = useState(0);
   const [outOfStock, setOutOfStock] = useState(false);
 
@@ -1319,7 +1385,11 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
                 </div>
                 <div className="mt-3">
                   <div className="d-flex gap-2">
-                    <Link to={`/product/${generateProductSlug(product.title, product.id)}`} className="btn btn-outline-primary btn-sm">
+                    <Link 
+                      to={`/product/${generateProductSlug(product.title, product.id)}`} 
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={onProductClick}
+                    >
                       View Details
                     </Link>
                     <button
@@ -1342,7 +1412,10 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
     <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
       <div className="product-card-zara">
         <div className="product-image-container">
-          <Link to={`/product/${generateProductSlug(product.title, product.id)}`}>
+          <Link 
+            to={`/product/${generateProductSlug(product.title, product.id)}`}
+            onClick={onProductClick}
+          >
             <img
               className="product-image"
               loading="lazy"
@@ -1378,7 +1451,11 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
         </div>
 
         <div className="product-info">
-          <Link to={`/product/${generateProductSlug(product.title, product.id)}`} className="product-title">
+          <Link 
+            to={`/product/${generateProductSlug(product.title, product.id)}`} 
+            className="product-title"
+            onClick={onProductClick}
+          >
             {product.title}
           </Link>
           <div className="product-price">₹ {Number(product.price).toLocaleString('en-IN')}</div>
