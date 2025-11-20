@@ -6,6 +6,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import toast from "react-hot-toast";
 import SearchModal from "./SearchModal";
+import { generateProductSlug } from "../utils/slugify";
 
 const normalizeId = (value) => {
   if (value === null || value === undefined) return "";
@@ -38,14 +39,21 @@ const Products = () => {
   const sortDropdownRef = useRef(null);
   const filterDropdownRef = useRef(null);
 
-  // Handle URL parameters for search and filters (only on initial load)
+  // Handle URL parameters for search and filters
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const searchFromURL = searchParams.get("search");
     const categoryFromURL = searchParams.get("category");
     const subcategoryFromURL = searchParams.get("subcategory");
 
-    setSearchTerm((prev) => prev || searchFromURL || "");
+    // ✅ Update search term from URL - if search param exists, use it; otherwise clear
+    if (searchFromURL !== null && searchFromURL.trim() !== "") {
+      console.log("🔍 Search term from URL:", searchFromURL);
+      setSearchTerm(searchFromURL);
+    } else {
+      // ✅ Clear search if no search param in URL
+      setSearchTerm("");
+    }
 
     if (categoryFromURL) {
       setSelectedCategory(categoryFromURL.toLowerCase());
@@ -72,14 +80,42 @@ const Products = () => {
       }
     }
 
-    // Search filter
+    // Search filter - ONLY search in product TITLE/NAME (NOT description, NOT category/subcategory)
     if (searchTerm) {
-      filtered = filtered.filter((item) =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.subcategory && item.subcategory.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+      const searchLower = searchTerm.toLowerCase().trim();
+      
+      const beforeFilter = filtered.length;
+      filtered = filtered.filter((item) => {
+        const title = (item.title || "").toLowerCase();
+        
+        // ✅ ONLY check title/name - NOT description
+        const matches = title.includes(searchLower);
+        
+        // ✅ Debug logging for matches
+        if (matches) {
+          console.log("🔍 SEARCH MATCH (TITLE ONLY):", {
+            searchTerm: searchTerm,
+            productTitle: item.title,
+            productId: item.id,
+            titleMatch: matches,
+            category: item.category,
+            subcategory: item.subcategory
+          });
+        }
+        
+        return matches;
+      });
+      
+      console.log(`🔍 Search "${searchTerm}" (TITLE ONLY): ${beforeFilter} → ${filtered.length} products`);
+      
+      // ✅ List all matched products
+      if (filtered.length > 0) {
+        console.log("📋 Matched Products:", filtered.map(p => ({
+          id: p.id,
+          title: p.title,
+          category: p.category
+        })));
+      }
     }
 
     // Price range filter
@@ -130,7 +166,7 @@ const Products = () => {
             images = [];
           }
 
-          return {
+          const productData = {
             id: item.item_id,
             title: item.name || "No Title",
             price: item.price || 0,
@@ -140,6 +176,25 @@ const Products = () => {
             images: images.length > 0 ? images : ["https://via.placeholder.com/150"],
             stock_quantity: item.stock_quantity || 1,
           };
+          
+          // ✅ Debug: Log "PEARL MINI TOTE" product data
+          if (productData.title && productData.title.toLowerCase().includes("pearl mini tote")) {
+            console.log("📦 PEARL MINI TOTE Product Data:", {
+              id: productData.id,
+              title: productData.title,
+              description: productData.description,
+              category: productData.category,
+              subcategory: productData.subcategory,
+              rawItem: {
+                name: item.name,
+                description: item.description,
+                category: item.category,
+                subcategory: item.subcategory
+              }
+            });
+          }
+          
+          return productData;
         });
 
         setOriginalData(formattedData);
@@ -200,24 +255,28 @@ const Products = () => {
   const filterBySubcategory = useCallback((category, subcategory) => {
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
-    const params = new URLSearchParams(location.search);
+    setSearchTerm(""); // ✅ Clear search when subcategory is selected
+    const params = new URLSearchParams();
     params.set("category", category);
     if (subcategory) {
       params.set("subcategory", subcategory);
     } else {
       params.delete("subcategory");
     }
+    params.delete("search"); // ✅ Remove search from URL
     navigate(`/product?${params.toString()}`);
-  }, [navigate, location.search]);
+  }, [navigate]);
 
   const filterAll = useCallback(() => {
     setSelectedCategory("all");
     setSelectedSubcategory("");
-    const params = new URLSearchParams(location.search);
+    setSearchTerm(""); // ✅ Clear search when showing all
+    const params = new URLSearchParams();
     params.delete("category");
     params.delete("subcategory");
+    params.delete("search"); // ✅ Remove search from URL
     navigate(`/product?${params.toString()}`);
-  }, [navigate, location.search]);
+  }, [navigate]);
 
   const toggleCategoryExpansion = useCallback((category) => {
     setExpandedCategories(prev => ({
@@ -244,12 +303,14 @@ const Products = () => {
     }
     setSelectedCategory(category);
     setSelectedSubcategory("");
-    const params = new URLSearchParams(location.search);
+    setSearchTerm(""); // ✅ Clear search when category is selected
+    const params = new URLSearchParams();
     params.set("category", category);
     params.delete("subcategory");
+    params.delete("search"); // ✅ Remove search from URL
     navigate(`/product?${params.toString()}`);
     setIsFilterDropdownOpen(false);
-  }, [filterAll, location.search, navigate]);
+  }, [filterAll, navigate]);
 
   const handleSortSelection = useCallback((value) => {
     setSortBy(value);
@@ -420,9 +481,70 @@ const Products = () => {
           <small className="text-muted">
             {filteredData.length} products • {selectedCategory !== "all" ? selectedCategory : "All categories"}
             {selectedSubcategory && ` > ${selectedSubcategory}`}
+            {searchTerm && ` • Searching: "${searchTerm}"`}
           </small>
         </div>
-        <div className="d-flex gap-2 filter-action-wrapper">
+        <div className="d-flex gap-2 filter-action-wrapper align-items-center">
+          {/* Search Input - Always visible when search term exists */}
+          {searchTerm && (
+            <div className="search-input-wrapper me-2" style={{ minWidth: '250px', maxWidth: '350px' }}>
+              <div className="input-group">
+                <span className="input-group-text bg-light">
+                  <i className="fa fa-search text-muted"></i>
+                </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchTerm(value);
+                    const params = new URLSearchParams(location.search);
+                    // Preserve category/subcategory when updating search
+                    if (selectedCategory !== "all") {
+                      params.set("category", selectedCategory);
+                    }
+                    if (selectedSubcategory) {
+                      params.set("subcategory", selectedSubcategory);
+                    }
+                    if (value.trim()) {
+                      params.set("search", value.trim());
+                    } else {
+                      params.delete("search");
+                    }
+                    navigate(`/product?${params.toString()}`);
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+                <button
+                  className="btn btn-outline-danger"
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    const params = new URLSearchParams(location.search);
+                    params.delete("search");
+                    // Preserve category when clearing search
+                    if (selectedCategory !== "all") {
+                      params.set("category", selectedCategory);
+                    }
+                    if (selectedSubcategory) {
+                      params.set("subcategory", selectedSubcategory);
+                    }
+                    navigate(`/product?${params.toString()}`);
+                  }}
+                  title="Clear search"
+                  style={{ borderColor: '#dc3545', color: '#dc3545' }}
+                >
+                  <i className="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+          )}
           <div className="filter-dropdown-wrapper" ref={sortDropdownRef}>
             <button
               className="btn filter-toggle-btn"
@@ -571,12 +693,39 @@ const Products = () => {
         ))}
       </div>
 
+      {/* Search Feedback */}
+      {searchTerm && !loading && (
+        <div className="alert alert-info mb-3" role="alert">
+          <i className="fa fa-search me-2"></i>
+          <strong>Searching for:</strong> "{searchTerm}" • Found {filteredData.length} {filteredData.length === 1 ? 'product' : 'products'}
+        </div>
+      )}
+
       {/* Empty State */}
-      {filteredData.length === 0 && !loading && (
+      {filteredData.length === 0 && !loading && searchTerm && (
+        <div className="text-center py-5">
+          <i className="fa fa-search fa-3x text-muted mb-3"></i>
+          <h5>No products found for "{searchTerm}"</h5>
+          <p className="text-muted">Try adjusting your search terms</p>
+          <button
+            className="btn btn-outline-primary mt-3"
+            onClick={() => {
+              setSearchTerm("");
+              const params = new URLSearchParams(location.search);
+              params.delete("search");
+              navigate(`/product?${params.toString()}`);
+            }}
+          >
+            <i className="fa fa-times me-2"></i>Clear Search
+          </button>
+        </div>
+      )}
+      
+      {filteredData.length === 0 && !loading && !searchTerm && (
         <div className="text-center py-5">
           <i className="fa fa-search fa-3x text-muted mb-3"></i>
           <h5>No products found</h5>
-          <p className="text-muted">Try adjusting your filters or search terms</p>
+          <p className="text-muted">Try adjusting your filters</p>
         </div>
       )}
 
@@ -1170,7 +1319,7 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
                 </div>
                 <div className="mt-3">
                   <div className="d-flex gap-2">
-                    <Link to={`/product/${product.id}`} className="btn btn-outline-primary btn-sm">
+                    <Link to={`/product/${generateProductSlug(product.title, product.id)}`} className="btn btn-outline-primary btn-sm">
                       View Details
                     </Link>
                     <button
@@ -1193,7 +1342,7 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
     <div className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
       <div className="product-card-zara">
         <div className="product-image-container">
-          <Link to={`/product/${product.id}`}>
+          <Link to={`/product/${generateProductSlug(product.title, product.id)}`}>
             <img
               className="product-image"
               loading="lazy"
@@ -1229,7 +1378,7 @@ const ProductCard = memo(({ product, viewMode, isWishlisted, onToggleWishlist, o
         </div>
 
         <div className="product-info">
-          <Link to={`/product/${product.id}`} className="product-title">
+          <Link to={`/product/${generateProductSlug(product.title, product.id)}`} className="product-title">
             {product.title}
           </Link>
           <div className="product-price">₹ {Number(product.price).toLocaleString('en-IN')}</div>

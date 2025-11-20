@@ -5,6 +5,7 @@ import { addCart, delCart, clearCart } from "../redux/action";
 import { Link, useNavigate } from "react-router-dom";
 import { syncCart } from "../redux/action";
 import toast from "react-hot-toast";
+import { generateProductSlug } from "../utils/slugify";
 
 const Cart = () => {
   const state = useSelector((state) => state.handleCart);
@@ -193,7 +194,7 @@ const Cart = () => {
         
         <div className="cart-item-content">
           <div className="cart-item-image-wrapper">
-            <Link to={`/product/${item.id}`}>
+            <Link to={`/product/${generateProductSlug(item.title || item.name, item.id)}`}>
               <img
                 src={item.image || "https://via.placeholder.com/150"}
                 alt={item.title}
@@ -208,10 +209,10 @@ const Cart = () => {
           </div>
           
           <div className="cart-item-details">
-            <Link to={`/product/${item.id}`} className="cart-item-brand">
+            <Link to={`/product/${generateProductSlug(item.title || item.name, item.id)}`} className="cart-item-brand">
               {item.category || item.categoryName || "ZAIRI"}
             </Link>
-            <Link to={`/product/${item.id}`} className="cart-item-title">
+            <Link to={`/product/${generateProductSlug(item.title || item.name, item.id)}`} className="cart-item-title">
               {item.title}
             </Link>
             

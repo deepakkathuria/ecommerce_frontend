@@ -6,9 +6,10 @@ import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
 import SEO from "../components/SEO";
 import toast from "react-hot-toast";
+import { generateProductSlug, extractIdFromSlug } from "../utils/slugify";
 
 const Product = () => {
-  const { id } = useParams();
+  const { id: urlParam } = useParams(); // Can be slug or ID
   const navigate = useNavigate();
   const cartState = useSelector((state) => state.handleCart);
   const [product, setProduct] = useState({});
@@ -18,6 +19,11 @@ const Product = () => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [showOutOfStockOverlay, setShowOutOfStockOverlay] = useState(false);
   const dispatch = useDispatch();
+  
+  // Extract product ID from URL param (could be slug or ID)
+  // If it's a pure number, use it directly. Otherwise, try to extract ID from slug.
+  const isNumericId = /^\d+$/.test(urlParam);
+  const id = isNumericId ? urlParam : (extractIdFromSlug(urlParam) || urlParam);
 
   let touchStartX = 0;
   let touchEndX = 0;
@@ -196,19 +202,31 @@ const Product = () => {
             productImages = ["https://via.placeholder.com/400"];
           }
 
+          const productTitle = productData.name || "No Title";
+          const productId = productData.item_id;
+          
           setProduct({
-            id: productData.item_id,
-            title: productData.name || "No Title",
+            id: productId,
+            title: productTitle,
             price: Math.round(productData.price) || 0,
             description: productData.description || "No description available",
             category: productData.category || "Uncategorized",
             subcategory: productData.subcategory || "",
-            code: productData.item_id || id,
+            code: productId || id,
             stock_quantity: productData.stock_quantity || 1,
           });
 
           setImages(productImages);
           setSelectedImage(productImages[0]);
+          
+          // Redirect to slug-based URL if current URL is ID-based (for SEO)
+          // Only redirect if URL is pure numeric ID, not if it's already a slug
+          const expectedSlug = generateProductSlug(productTitle, productId);
+          const isPureNumericId = /^\d+$/.test(urlParam);
+          if (isPureNumericId && urlParam === String(productId) && urlParam !== expectedSlug) {
+            // Redirect old ID-only URLs to SEO-friendly slug URLs
+            navigate(`/product/${expectedSlug}`, { replace: true });
+          }
         }
       } catch (error) {
         console.error("Error fetching product details:", error);
@@ -325,7 +343,8 @@ const Product = () => {
 
   // Prepare product data for SEO
   const productImage = selectedImage || images[0] || "https://i.ibb.co/fQ293tm/image.png";
-  const productUrl = `https://zairi.in/product/${id}`;
+  const productSlug = product.title ? generateProductSlug(product.title, product.id) : id;
+  const productUrl = `https://zairi.in/product/${productSlug}`;
   const productDescription = product.description 
     ? `${product.description.substring(0, 160)}...` 
     : `Buy ${product.title || "Premium Jewelry"} at Zairi. Premium quality jewelry and antiques collection.`;

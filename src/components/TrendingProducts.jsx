@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { generateProductSlug } from "../utils/slugify";
 
 const TrendingProducts = () => {
   const [trending, setTrending] = useState([]);
@@ -56,7 +57,7 @@ const TrendingProducts = () => {
           <div className="col-6 col-md-4 col-lg-3 mb-4" key={product.id}>
             <div className="product-card-zara">
               <div className="product-image-container">
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${generateProductSlug(product.title, product.id)}`}>
                   <img
                     src={product.images?.[0] || "https://via.placeholder.com/200x200"}
                     alt={product.title}
@@ -65,7 +66,7 @@ const TrendingProducts = () => {
                 </Link>
               </div>
               <div className="product-info">
-                <Link to={`/product/${product.id}`} className="product-title">
+                <Link to={`/product/${generateProductSlug(product.title, product.id)}`} className="product-title">
                   {product.title}
                 </Link>
                 <div className="product-price">₹ {Number(product.price).toLocaleString('en-IN')}</div>

@@ -6,6 +6,7 @@ import { Navbar, Footer } from "../components";
 import toast from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { generateProductSlug } from "../utils/slugify";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -254,7 +255,7 @@ const Wishlist = () => {
               <div key={productId} className="col-6 col-md-4 col-lg-3 mb-4">
                 <div className="product-card-zara position-relative">
                   <div className="product-image-container">
-                    <Link to={`/product/${productId}`}>
+                    <Link to={`/product/${generateProductSlug(item.name, productId)}`}>
                       <img
                         src={item.image || "https://via.placeholder.com/300"}
                         alt={item.name}
@@ -283,7 +284,7 @@ const Wishlist = () => {
                     </button>
                   </div>
                   <div className="product-info">
-                    <Link to={`/product/${productId}`} className="product-title">
+                    <Link to={`/product/${generateProductSlug(item.name, productId)}`} className="product-title">
                       {item.name}
                     </Link>
                     <div className="product-price">₹ {Number(item.price || 0).toLocaleString('en-IN')}</div>

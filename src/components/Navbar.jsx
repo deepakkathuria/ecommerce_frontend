@@ -184,9 +184,14 @@ const Navbar = () => {
   };
 
   const handleSearch = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/product?search=${encodeURIComponent(searchQuery.trim())}`);
+      // ✅ Show loading/feedback when searching
+      const searchTerm = searchQuery.trim();
+      console.log("🔍 Searching for:", searchTerm);
+      
+      // Navigate to products page with search
+      navigate(`/product?search=${encodeURIComponent(searchTerm)}`);
       setSearchQuery("");
       setIsMobileMenuOpen(false);
     }
@@ -196,6 +201,12 @@ const Navbar = () => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       handleSearch(e);
     }
+  };
+
+  const handleSearchIconClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleSearch(e);
   };
 
   const toggleProfileDropdown = () => setIsProfileDropdownOpen((prev) => !prev);
@@ -743,7 +754,7 @@ const Navbar = () => {
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setIsSearchFocused(false)}
                 />
-                <span className="search-icon" onClick={handleSearch}>
+                <span className="search-icon" onClick={handleSearchIconClick}>
                   <i className="fa fa-search"></i>
                 </span>
               </form>
