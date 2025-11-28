@@ -22,20 +22,6 @@ function Home() {
           </div>
         </div>
       </div>
-      
-      {/* SEO Hero Section - Visible Text for Google */}
-      <div className="seo-hero-section">
-        <div className="container py-4">
-          <h1 className="seo-hero-title">Welcome to Zairi - Premium Jewelry & Antiques</h1>
-          <p className="seo-hero-text">
-            <strong>Zairi</strong> is your destination for exquisite jewelry, antiques, and unique collectibles. 
-            Shop authentic vintage jewelry and premium pieces at <strong>zairi.in</strong>. 
-            Discover handpicked jewelry collections, antique treasures, and vintage accessories. 
-            <strong>Zairi</strong> offers free shipping above ₹1000 and COD available.
-          </p>
-        </div>
-      </div>
-      
       <Main />
       <TrendingProducts />
 
@@ -103,43 +89,6 @@ function Home() {
           .banner-text {
             font-size: 12px;
             line-height: 1.4;
-          }
-        }
-
-        /* SEO Hero Section */
-        .seo-hero-section {
-          background: #f8f9fa;
-          text-align: center;
-          margin-bottom: 20px;
-        }
-
-        .seo-hero-title {
-          font-size: 28px;
-          font-weight: 700;
-          color: #000;
-          margin-bottom: 15px;
-        }
-
-        .seo-hero-text {
-          font-size: 16px;
-          line-height: 1.8;
-          color: #333;
-          max-width: 900px;
-          margin: 0 auto;
-        }
-
-        .seo-hero-text strong {
-          color: #000;
-          font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-          .seo-hero-title {
-            font-size: 24px;
-          }
-          .seo-hero-text {
-            font-size: 14px;
-            padding: 0 15px;
           }
         }
       `}</style>
