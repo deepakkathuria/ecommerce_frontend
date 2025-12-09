@@ -40,6 +40,8 @@ const Navbar = () => {
         
         if (result.rows) {
           const categoryMap = {};
+          const jewelleryMaterialMap = {}; // ✅ NEW: Map to store material -> subcategories for jewellery
+          
           result.rows.forEach((item) => {
             const category = item.category?.toLowerCase().trim();
             if (category) {
@@ -48,6 +50,17 @@ const Navbar = () => {
               }
               if (item.subcategory) {
                 categoryMap[category].add(item.subcategory.toLowerCase().trim());
+              }
+              
+              // ✅ NEW: For jewellery category, group by material and subcategory
+              if (category.toLowerCase() === 'jewellery' && item.material && item.subcategory) {
+                const material = item.material.toLowerCase().trim();
+                const subcategory = item.subcategory.toLowerCase().trim();
+                
+                if (!jewelleryMaterialMap[material]) {
+                  jewelleryMaterialMap[material] = new Set();
+                }
+                jewelleryMaterialMap[material].add(subcategory);
               }
             }
           });
@@ -66,40 +79,64 @@ const Navbar = () => {
           Object.keys(formattedCategories).forEach((category) => {
             const subcats = formattedCategories[category];
             if (subcats.length > 0) {
-              // Organize subcategories into columns
-              // Each subcategory becomes its own section/column
-              const sections = [];
-              
-              subcats.forEach((subcat) => {
-                const displayName = subcat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-                sections.push({
-                  title: displayName,
-                  items: [displayName],
-                  subcategoryKeys: [subcat]
-                });
-              });
-
-              // ✅ Add material filters for jewellery category
+              // ✅ For jewellery category: Dynamically show materials and their subcategories
               if (category.toLowerCase() === 'jewellery') {
-                sections.push({
-                  title: 'ANTITARNISH',
-                  items: ['ANTITARNISH'],
-                  subcategoryKeys: [],
-                  isMaterial: true,
-                  material: 'antitarnish'
+                const sections = [];
+                
+                // ✅ Get all materials that exist in the database
+                const materials = Object.keys(jewelleryMaterialMap);
+                
+                // ✅ Sort materials: antitarnish first, then brass, then others
+                const sortedMaterials = materials.sort((a, b) => {
+                  if (a === 'antitarnish') return -1;
+                  if (b === 'antitarnish') return 1;
+                  if (a === 'brass') return -1;
+                  if (b === 'brass') return 1;
+                  return a.localeCompare(b);
                 });
-                sections.push({
-                  title: 'BRASS',
-                  items: ['BRASS'],
-                  subcategoryKeys: [],
-                  isMaterial: true,
-                  material: 'brass'
+                
+                sortedMaterials.forEach((material) => {
+                  // ✅ Get subcategories that exist for this material
+                  const materialSubcats = Array.from(jewelleryMaterialMap[material]).sort();
+                  
+                  if (materialSubcats.length > 0) {
+                    // ✅ Format material name (capitalize first letter, uppercase)
+                    const materialDisplayName = material
+                      .split('-')
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toUpperCase())
+                      .join(' ');
+                    
+                    sections.push({
+                      title: materialDisplayName,
+                      isMaterial: true,
+                      material: material,
+                      subcategories: materialSubcats.map(subcat => ({
+                        displayName: subcat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+                        key: subcat
+                      }))
+                    });
+                  }
                 });
-              }
+                
+                menuStructure[category] = {
+                  sections: sections
+                };
+              } else {
+                // For other categories: Show subcategories directly
+                const sections = [];
+                subcats.forEach((subcat) => {
+                  const displayName = subcat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                  sections.push({
+                    title: displayName,
+                    items: [displayName],
+                    subcategoryKeys: [subcat]
+                  });
+                });
 
-              menuStructure[category] = {
-                sections: sections
-              };
+                menuStructure[category] = {
+                  sections: sections
+                };
+              }
             }
           });
 
@@ -353,21 +390,32 @@ const Navbar = () => {
           background: #fff;
           box-shadow: 0 4px 12px rgba(0,0,0,0.15);
           border: 1px solid #eaeaec;
-          min-width: 800px;
+          min-width: 600px;
+          max-width: 800px;
           max-height: 500px;
           overflow-y: auto;
           z-index: 10000;
-          padding: 20px;
+          padding: 30px 20px;
           display: flex;
+          gap: 0;
         }
 
         .category-dropdown-column {
           flex: 1;
-          padding: 0 15px;
+          padding: 0 20px;
+          border-right: 1px solid #f0f0f0;
+        }
+
+        .category-dropdown-column:last-child {
+          border-right: none;
         }
 
         .category-dropdown-section {
-          margin-bottom: 25px;
+          margin-bottom: 0;
+        }
+
+        .material-section-wrapper {
+          width: 100%;
         }
 
         .category-dropdown-title {
@@ -384,6 +432,37 @@ const Navbar = () => {
 
         .category-dropdown-title:hover {
           color: #333;
+        }
+
+        .material-title {
+          cursor: default;
+          margin-bottom: 10px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #f0f0f0;
+        }
+
+        .material-subcategories {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .category-dropdown-subitem {
+          display: block;
+          padding: 8px 0 8px 0;
+          font-size: 13px;
+          font-weight: 400;
+          color: #282c3f;
+          text-decoration: none;
+          text-transform: uppercase;
+          transition: all 0.2s;
+          letter-spacing: 0.3px;
+        }
+
+        .category-dropdown-subitem:hover {
+          color: #000;
+          font-weight: 500;
+          padding-left: 5px;
         }
 
         .category-dropdown-item {
@@ -746,14 +825,26 @@ const Navbar = () => {
                     <div key={idx} className="category-dropdown-column">
                       <div className="category-dropdown-section">
                         {section.isMaterial ? (
-                          <NavLink
-                            to={`/product?category=${hoveredCategory}&material=${section.material}`}
-                            className="category-dropdown-title"
-                            onClick={() => setHoveredCategory(null)}
-                          >
-                            {section.title}
-                          </NavLink>
+                          // ✅ Material section with subcategories nested under it
+                          <div className="material-section-wrapper">
+                            <div className="category-dropdown-title material-title">
+                              {section.title}
+                            </div>
+                            <div className="material-subcategories">
+                              {section.subcategories && section.subcategories.map((subcat, subIdx) => (
+                                <NavLink
+                                  key={subIdx}
+                                  to={`/product?category=${hoveredCategory}&material=${section.material}&subcategory=${subcat.key}`}
+                                  className="category-dropdown-subitem"
+                                  onClick={() => setHoveredCategory(null)}
+                                >
+                                  {subcat.displayName}
+                                </NavLink>
+                              ))}
+                            </div>
+                          </div>
                         ) : (
+                          // Regular subcategory link (for non-jewellery categories)
                           <NavLink
                             to={`/product?category=${hoveredCategory}&subcategory=${section.subcategoryKeys[0]}`}
                             className="category-dropdown-title"
@@ -1050,16 +1141,47 @@ const Navbar = () => {
                       {/* Subcategories */}
                       {isExpanded && hasSubcategories && (
                         <div className="mobile-subcategories">
-                          {categoryMenuData[category].sections.map((section, idx) => (
-                            <NavLink
-                              key={idx}
-                              to={`/product?category=${category}&subcategory=${section.subcategoryKeys[0]}`}
-                              className="mobile-subcategory-btn"
-                              onClick={toggleMobileMenu}
-                            >
-                              {section.title}
-                            </NavLink>
-                          ))}
+                          {categoryMenuData[category].sections.map((section, idx) => {
+                            // ✅ For jewellery: Show materials with nested subcategories
+                            if (section.isMaterial && category.toLowerCase() === 'jewellery') {
+                              return (
+                                <div key={idx} className="mb-3">
+                                  <div className="mobile-material-title" style={{ 
+                                    fontWeight: '700', 
+                                    fontSize: '13px', 
+                                    color: '#000', 
+                                    padding: '8px 15px',
+                                    textTransform: 'uppercase'
+                                  }}>
+                                    {section.title}
+                                  </div>
+                                  {section.subcategories && section.subcategories.map((subcat, subIdx) => (
+                                    <NavLink
+                                      key={subIdx}
+                                      to={`/product?category=${category}&material=${section.material}&subcategory=${subcat.key}`}
+                                      className="mobile-subcategory-btn"
+                                      onClick={toggleMobileMenu}
+                                      style={{ marginLeft: '20px' }}
+                                    >
+                                      {subcat.displayName}
+                                    </NavLink>
+                                  ))}
+                                </div>
+                              );
+                            } else {
+                              // For other categories: Show subcategories directly
+                              return (
+                                <NavLink
+                                  key={idx}
+                                  to={`/product?category=${category}&subcategory=${section.subcategoryKeys[0]}`}
+                                  className="mobile-subcategory-btn"
+                                  onClick={toggleMobileMenu}
+                                >
+                                  {section.title}
+                                </NavLink>
+                              );
+                            }
+                          })}
                         </div>
                       )}
                     </div>
