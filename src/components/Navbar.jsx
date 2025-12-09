@@ -685,14 +685,38 @@ const Navbar = () => {
         }
 
         .mobile-subcategories {
-          padding-left: 20px;
+          padding-left: 0;
           padding-top: 10px;
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          border-left: 2px solid #eaeaec;
-          margin-left: 15px;
+          gap: 12px;
+          margin-left: 0;
           margin-top: 8px;
+        }
+
+        .mobile-material-section {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-bottom: 4px;
+        }
+
+        .mobile-material-title {
+          font-weight: 700;
+          font-size: 13px;
+          color: #000;
+          padding: 8px 15px;
+          text-transform: uppercase;
+          background: #f8f8f8;
+          border-radius: 6px;
+          letter-spacing: 0.5px;
+        }
+
+        .mobile-material-subcategories {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          padding-left: 15px;
         }
 
         .mobile-subcategory-btn {
@@ -705,7 +729,9 @@ const Navbar = () => {
           font-size: 13px;
           font-weight: 500;
           text-align: left;
+          text-transform: uppercase;
           transition: all 0.2s;
+          letter-spacing: 0.3px;
         }
 
         .mobile-subcategory-btn:hover {
@@ -1145,27 +1171,22 @@ const Navbar = () => {
                             // ✅ For jewellery: Show materials with nested subcategories
                             if (section.isMaterial && category.toLowerCase() === 'jewellery') {
                               return (
-                                <div key={idx} className="mb-3">
-                                  <div className="mobile-material-title" style={{ 
-                                    fontWeight: '700', 
-                                    fontSize: '13px', 
-                                    color: '#000', 
-                                    padding: '8px 15px',
-                                    textTransform: 'uppercase'
-                                  }}>
+                                <div key={idx} className="mobile-material-section">
+                                  <div className="mobile-material-title">
                                     {section.title}
                                   </div>
-                                  {section.subcategories && section.subcategories.map((subcat, subIdx) => (
-                                    <NavLink
-                                      key={subIdx}
-                                      to={`/product?category=${category}&material=${section.material}&subcategory=${subcat.key}`}
-                                      className="mobile-subcategory-btn"
-                                      onClick={toggleMobileMenu}
-                                      style={{ marginLeft: '20px' }}
-                                    >
-                                      {subcat.displayName}
-                                    </NavLink>
-                                  ))}
+                                  <div className="mobile-material-subcategories">
+                                    {section.subcategories && section.subcategories.map((subcat, subIdx) => (
+                                      <NavLink
+                                        key={subIdx}
+                                        to={`/product?category=${category}&material=${section.material}&subcategory=${subcat.key}`}
+                                        className="mobile-subcategory-btn"
+                                        onClick={toggleMobileMenu}
+                                      >
+                                        {subcat.displayName}
+                                      </NavLink>
+                                    ))}
+                                  </div>
                                 </div>
                               );
                             } else {
