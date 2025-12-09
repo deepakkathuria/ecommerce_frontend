@@ -20,6 +20,7 @@ const Products = () => {
   const [categoryMap, setCategoryMap] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [selectedMaterial, setSelectedMaterial] = useState(""); // ✅ NEW: Material filter
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
@@ -45,6 +46,7 @@ const Products = () => {
     const searchFromURL = searchParams.get("search");
     const categoryFromURL = searchParams.get("category");
     const subcategoryFromURL = searchParams.get("subcategory");
+    const materialFromURL = searchParams.get("material"); // ✅ NEW: Material from URL
 
     // ✅ Update search term from URL - if search param exists, use it; otherwise clear
     if (searchFromURL !== null && searchFromURL.trim() !== "") {
@@ -62,9 +64,16 @@ const Products = () => {
       } else {
         setSelectedSubcategory("");
       }
+      // ✅ NEW: Set material from URL
+      if (materialFromURL) {
+        setSelectedMaterial(materialFromURL.toLowerCase());
+      } else {
+        setSelectedMaterial("");
+      }
     } else {
       setSelectedCategory("all");
       setSelectedSubcategory("");
+      setSelectedMaterial("");
     }
   }, [location.search]);
 
@@ -85,6 +94,13 @@ const Products = () => {
       filtered = filtered.filter((item) => item.category === selectedCategory);
       if (selectedSubcategory) {
         filtered = filtered.filter((item) => item.subcategory === selectedSubcategory);
+      }
+      // ✅ NEW: Material filter
+      if (selectedMaterial) {
+        filtered = filtered.filter((item) => {
+          const itemMaterial = item.material?.toLowerCase().trim() || "";
+          return itemMaterial === selectedMaterial.toLowerCase().trim();
+        });
       }
     }
 
@@ -147,7 +163,7 @@ const Products = () => {
     }
 
     return filtered;
-  }, [originalData, selectedCategory, selectedSubcategory, searchTerm, sortBy, priceRange]);
+  }, [originalData, selectedCategory, selectedSubcategory, selectedMaterial, searchTerm, sortBy, priceRange]);
 
   const wishlistIdSet = useMemo(() => new Set(wishlistIds), [wishlistIds]);
 
@@ -219,6 +235,11 @@ const Products = () => {
         const url = new URL("https://hammerhead-app-jkdit.ondigitalocean.app/products");
         url.searchParams.append("page", page);
         url.searchParams.append("limit", 1000);
+        
+        // ✅ NEW: Add material parameter to API call if selected
+        if (selectedMaterial) {
+          url.searchParams.append("material", selectedMaterial);
+        }
 
         const response = await fetch(url.toString());
         const result = await response.json();
@@ -238,6 +259,7 @@ const Products = () => {
             description: item.description || "No description available",
             category: item.category?.toLowerCase() || "uncategorized",
             subcategory: item.subcategory?.toLowerCase() || "",
+            material: item.material?.toLowerCase() || "", // ✅ NEW: Add material
             images: images.length > 0 ? images : ["https://via.placeholder.com/150"],
             stock_quantity: item.stock_quantity || 1,
           };
@@ -288,7 +310,7 @@ const Products = () => {
     };
 
     getProducts();
-  }, [page]);
+  }, [page, selectedMaterial]); // ✅ NEW: Re-fetch when material changes
 
   const fetchWishlist = useCallback(async () => {
     const token = localStorage.getItem("apitoken");
@@ -320,6 +342,7 @@ const Products = () => {
   const filterBySubcategory = useCallback((category, subcategory) => {
     setSelectedCategory(category);
     setSelectedSubcategory(subcategory);
+    setSelectedMaterial(""); // ✅ NEW: Clear material when subcategory changes
     setSearchTerm(""); // ✅ Clear search when subcategory is selected
     const params = new URLSearchParams();
     params.set("category", category);
@@ -328,6 +351,7 @@ const Products = () => {
     } else {
       params.delete("subcategory");
     }
+    params.delete("material"); // ✅ NEW: Remove material from URL
     params.delete("search"); // ✅ Remove search from URL
     navigate(`/product?${params.toString()}`);
   }, [navigate]);
@@ -354,6 +378,7 @@ const Products = () => {
     setSearchTerm("");
     setSelectedCategory("all");
     setSelectedSubcategory("");
+    setSelectedMaterial(""); // ✅ NEW: Clear material filter
     setSortBy("default");
     setPriceRange({ min: 0, max: 10000 });
     setExpandedCategories({});
@@ -368,10 +393,12 @@ const Products = () => {
     }
     setSelectedCategory(category);
     setSelectedSubcategory("");
+    setSelectedMaterial(""); // ✅ NEW: Clear material when category changes
     setSearchTerm(""); // ✅ Clear search when category is selected
     const params = new URLSearchParams();
     params.set("category", category);
     params.delete("subcategory");
+    params.delete("material"); // ✅ NEW: Remove material from URL
     params.delete("search"); // ✅ Remove search from URL
     navigate(`/product?${params.toString()}`);
     setIsFilterDropdownOpen(false);
@@ -546,6 +573,7 @@ const Products = () => {
           <small className="text-muted">
             {filteredData.length} products • {selectedCategory !== "all" ? selectedCategory : "All categories"}
             {selectedSubcategory && ` > ${selectedSubcategory}`}
+            {selectedMaterial && ` > ${selectedMaterial}`}
             {searchTerm && ` • Searching: "${searchTerm}"`}
           </small>
         </div>
@@ -735,6 +763,54 @@ const Products = () => {
                           {sub.split("-").join(" ").toUpperCase()}
                         </button>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ✅ NEW: Material Filter Section (for jewellery category) */}
+                {selectedCategory === "jewellery" && (
+                  <div className="filter-section">
+                    <h6 className="mb-2">Material</h6>
+                    <div className="filter-tag-container">
+                      <button
+                        className={`filter-tag ${!selectedMaterial ? "active" : ""}`}
+                        onClick={() => {
+                          setSelectedMaterial("");
+                          const params = new URLSearchParams(location.search);
+                          params.delete("material");
+                          if (selectedCategory !== "all") params.set("category", selectedCategory);
+                          if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
+                          navigate(`/product?${params.toString()}`);
+                        }}
+                      >
+                        All
+                      </button>
+                      <button
+                        className={`filter-tag ${selectedMaterial === "antitarnish" ? "active" : ""}`}
+                        onClick={() => {
+                          setSelectedMaterial("antitarnish");
+                          const params = new URLSearchParams(location.search);
+                          params.set("material", "antitarnish");
+                          if (selectedCategory !== "all") params.set("category", selectedCategory);
+                          if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
+                          navigate(`/product?${params.toString()}`);
+                        }}
+                      >
+                        ANTITARNISH
+                      </button>
+                      <button
+                        className={`filter-tag ${selectedMaterial === "brass" ? "active" : ""}`}
+                        onClick={() => {
+                          setSelectedMaterial("brass");
+                          const params = new URLSearchParams(location.search);
+                          params.set("material", "brass");
+                          if (selectedCategory !== "all") params.set("category", selectedCategory);
+                          if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
+                          navigate(`/product?${params.toString()}`);
+                        }}
+                      >
+                        BRASS
+                      </button>
                     </div>
                   </div>
                 )}

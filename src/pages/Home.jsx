@@ -12,12 +12,12 @@ function Home() {
         url="https://zairi.in"
       />
       <Navbar />
-      {/* Black Friday Sale Banner */}
+      {/* Free Shipping Banner */}
       <div className="black-friday-banner">
         <div className="container">
           <div className="banner-content">
             <span className="banner-text">
-              🎉 <strong>Black Friday Sale</strong> - Starts 26th Nov - Use Promo Code <strong>BLAFRI20</strong> FOR FLAT 20% OFF | <strong>Free Shipping Above ₹1000</strong> 🎉
+              <strong>Free Shipping Above ₹1000</strong>
             </span>
           </div>
         </div>

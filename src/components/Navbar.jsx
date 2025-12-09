@@ -79,6 +79,24 @@ const Navbar = () => {
                 });
               });
 
+              // ✅ Add material filters for jewellery category
+              if (category.toLowerCase() === 'jewellery') {
+                sections.push({
+                  title: 'ANTITARNISH',
+                  items: ['ANTITARNISH'],
+                  subcategoryKeys: [],
+                  isMaterial: true,
+                  material: 'antitarnish'
+                });
+                sections.push({
+                  title: 'BRASS',
+                  items: ['BRASS'],
+                  subcategoryKeys: [],
+                  isMaterial: true,
+                  material: 'brass'
+                });
+              }
+
               menuStructure[category] = {
                 sections: sections
               };
@@ -727,13 +745,23 @@ const Navbar = () => {
                   {categoryMenuData[hoveredCategory].sections.map((section, idx) => (
                     <div key={idx} className="category-dropdown-column">
                       <div className="category-dropdown-section">
-                        <NavLink
-                          to={`/product?category=${hoveredCategory}&subcategory=${section.subcategoryKeys[0]}`}
-                          className="category-dropdown-title"
-                          onClick={() => setHoveredCategory(null)}
-                        >
-                          {section.title}
-                        </NavLink>
+                        {section.isMaterial ? (
+                          <NavLink
+                            to={`/product?category=${hoveredCategory}&material=${section.material}`}
+                            className="category-dropdown-title"
+                            onClick={() => setHoveredCategory(null)}
+                          >
+                            {section.title}
+                          </NavLink>
+                        ) : (
+                          <NavLink
+                            to={`/product?category=${hoveredCategory}&subcategory=${section.subcategoryKeys[0]}`}
+                            className="category-dropdown-title"
+                            onClick={() => setHoveredCategory(null)}
+                          >
+                            {section.title}
+                          </NavLink>
+                        )}
                       </div>
                     </div>
                   ))}
