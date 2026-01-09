@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { clearCart } from "../redux/action";
 import PromoInput from "./PromoInput";
+import FreeRingSelector from "../components/FreeRingSelector";
 
 const Checkout = () => {
   const cart = useSelector((state) => state.handleCart);
@@ -20,12 +21,35 @@ const Checkout = () => {
 
   const [discount, setDiscount] = useState(0);
   const [promoApplied, setPromoApplied] = useState(false);
+  const [showFreeRingSelector, setShowFreeRingSelector] = useState(false);
+  const [selectedFreeRingId, setSelectedFreeRingId] = useState(null);
+  const [selectedFreeRingName, setSelectedFreeRingName] = useState(null);
+  const [promotionActive, setPromotionActive] = useState(false);
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
   // const shipping = 0;
   const shipping = subtotal > 1000 ? 0 : 49;
 
   const total = subtotal - discount + shipping;
+
+  // Check if free ring promotion is active
+  useEffect(() => {
+    const checkPromotion = async () => {
+      try {
+        const response = await fetch(
+          "https://hammerhead-app-jkdit.ondigitalocean.app/promotion/free-ring/status"
+        );
+        const data = await response.json();
+        setPromotionActive(data.active || false);
+        // ✅ Removed auto-open - user will click button to open
+      } catch (error) {
+        console.error("Error checking promotion:", error);
+        setPromotionActive(false);
+      }
+    };
+
+    checkPromotion();
+  }, [subtotal]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -103,6 +127,7 @@ const Checkout = () => {
                   postal_code: zip,
                   country: "India",
                 },
+                free_ring_id: selectedFreeRingId || null, // ✅ Include free ring if selected
               },
             }),
           });
@@ -227,7 +252,7 @@ const Checkout = () => {
               <div className="card-body">
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item d-flex justify-content-between">
-                    Products ({cart.reduce((acc, item) => acc + item.qty, 0)}) <span>₹{Math.round(subtotal)}</span>
+                    Products ({cart.reduce((acc, item) => acc + item.qty, 0) + (selectedFreeRingId ? 1 : 0)}) <span>₹{Math.round(subtotal)}</span>
                   </li>
                   {promoApplied && (
                     <li className="list-group-item d-flex justify-content-between text-success">
@@ -237,10 +262,56 @@ const Checkout = () => {
                   <li className="list-group-item d-flex justify-content-between">
                     Shipping <span>₹{shipping}</span>
                   </li>
+                  {promotionActive && subtotal >= 1000 && selectedFreeRingId && (
+                    <li className="list-group-item d-flex justify-content-between text-success">
+                      <span>🎁 Free Ring: {selectedFreeRingName || "Selected"}</span>
+                      <span className="text-success">FREE</span>
+                    </li>
+                  )}
                   <li className="list-group-item d-flex justify-content-between">
                     <strong>Total</strong> <strong>₹{Math.round(total)}</strong>
                   </li>
                 </ul>
+
+                {/* Free Ring Promotion Banner */}
+                {promotionActive && subtotal >= 1000 && (
+                  <div className="free-ring-banner mt-3 p-3" style={{
+                    background: "#fff5f7",
+                    border: "2px solid #ff3f6c",
+                    borderRadius: "8px",
+                    textAlign: "center"
+                  }}>
+                    <h6 style={{ color: "#ff3f6c", marginBottom: "8px" }}>
+                      🎁 You Qualify for a FREE Ring!
+                    </h6>
+                    {selectedFreeRingId ? (
+                      <div>
+                        <p style={{ fontSize: "14px", color: "#333", margin: 0, fontWeight: "600" }}>
+                          Free ring selected ✓
+                        </p>
+                        {selectedFreeRingName && (
+                          <p style={{ fontSize: "13px", color: "#666", margin: "4px 0 0 0" }}>
+                            {selectedFreeRingName}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        style={{
+                          background: "#ff3f6c",
+                          color: "#fff",
+                          border: "none",
+                          marginTop: "8px"
+                        }}
+                        onClick={() => setShowFreeRingSelector(true)}
+                      >
+                        Select Your Free Ring
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 <PromoInput
                   subtotal={subtotal}
@@ -254,6 +325,19 @@ const Checkout = () => {
         </div>
       </div>
       <Footer />
+
+      {/* Free Ring Selector Modal */}
+      {showFreeRingSelector && promotionActive && subtotal >= 1000 && (
+        <FreeRingSelector
+          onSelect={(ringId, ringName) => {
+            setSelectedFreeRingId(ringId);
+            setSelectedFreeRingName(ringName);
+            setShowFreeRingSelector(false);
+          }}
+          selectedRingId={selectedFreeRingId}
+          onClose={() => setShowFreeRingSelector(false)}
+        />
+      )}
 
       <style>{`
         .checkout-pay-btn {

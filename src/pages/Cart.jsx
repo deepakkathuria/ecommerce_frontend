@@ -253,9 +253,40 @@ const Cart = () => {
     const shipping = subtotal >= 1000 ? 0 : 49;
     const total = subtotal + shipping;
     const totalItems = state.reduce((acc, item) => acc + (item.qty || 1), 0);
+    const [promotionActive, setPromotionActive] = useState(false);
+
+    // Check if free ring promotion is active
+    useEffect(() => {
+      const checkPromotion = async () => {
+        try {
+          const response = await fetch(
+            "https://hammerhead-app-jkdit.ondigitalocean.app/promotion/free-ring/status"
+          );
+          const data = await response.json();
+          setPromotionActive(data.active || false);
+        } catch (error) {
+          console.error("Error checking promotion:", error);
+          setPromotionActive(false);
+        }
+      };
+
+      checkPromotion();
+    }, []);
 
     return (
       <div className="cart-container">
+        {/* Free Ring Promotion Banner */}
+        {promotionActive && subtotal >= 1000 && (
+          <div className="cart-promotion-banner">
+            <div className="promotion-content">
+              <span className="promotion-icon">🎁</span>
+              <div className="promotion-text">
+                <strong>Special Offer!</strong> You qualify for a <strong>FREE RING</strong> with your order above ₹1000. After you place order, you will get option to select your free ring!
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="cart-row">
           {/* Left Side - Cart Items */}
           <div className="cart-items-section">
@@ -379,6 +410,58 @@ const Cart = () => {
           padding: 20px;
           background: #fafafa;
           min-height: 60vh;
+        }
+
+        /* Promotion Banner */
+        .cart-promotion-banner {
+          background: linear-gradient(135deg, #fff5f7 0%, #ffeef2 100%);
+          border: 2px solid #ff3f6c;
+          border-radius: 8px;
+          padding: 16px 20px;
+          margin-bottom: 20px;
+          box-shadow: 0 2px 8px rgba(255, 63, 108, 0.1);
+        }
+
+        .promotion-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .promotion-icon {
+          font-size: 32px;
+          flex-shrink: 0;
+        }
+
+        .promotion-text {
+          flex: 1;
+          font-size: 15px;
+          color: #333;
+          line-height: 1.5;
+        }
+
+        .promotion-text strong {
+          color: #ff3f6c;
+        }
+
+        @media (max-width: 576px) {
+          .cart-promotion-banner {
+            padding: 12px 16px;
+          }
+
+          .promotion-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 8px;
+          }
+
+          .promotion-icon {
+            font-size: 24px;
+          }
+
+          .promotion-text {
+            font-size: 14px;
+          }
         }
 
         .cart-row {

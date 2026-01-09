@@ -43,11 +43,29 @@ const InvoicePage = () => {
         <hr />
         <h5>Order Summary</h5>
         <ul className="list-group mb-3">
-          {order.products.map((item, index) => (
-            <li key={index} className="list-group-item d-flex justify-content-between">
-              {item.name} (x{item.quantity}) <span>Rs.{item.price}</span>
-            </li>
-          ))}
+          {order.products.map((item, index) => {
+            const isFreeRing = item.price === 0 || item.price === "0";
+            return (
+              <li key={index} className="list-group-item d-flex justify-content-between">
+                <span>
+                  {item.name} (x{item.quantity})
+                  {isFreeRing && <span className="badge bg-success ms-2">FREE</span>}
+                </span>
+                <span>
+                  {isFreeRing ? (
+                    <>
+                      <span style={{ textDecoration: "line-through", color: "#999", marginRight: "8px" }}>
+                        Rs.{item.price || "0"}
+                      </span>
+                      <span className="text-success">FREE</span>
+                    </>
+                  ) : (
+                    <span>Rs.{item.price}</span>
+                  )}
+                </span>
+              </li>
+            );
+          })}
           <li className="list-group-item d-flex justify-content-between">
             <strong>Total</strong> <strong>Rs.{order.total_amount}</strong>
           </li>

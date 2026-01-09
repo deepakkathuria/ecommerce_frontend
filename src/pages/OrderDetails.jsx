@@ -59,7 +59,12 @@ const OrderDetails = () => {
           const productImage =
             Array.isArray(product.image) && product.image.length > 0
               ? product.image[0]
+              : typeof product.image === "string" 
+              ? product.image 
               : "https://via.placeholder.com/100";
+          
+          // Check if this is a free ring (price = 0)
+          const isFreeRing = product.price === 0 || product.price === "0";
 
           return (
             <li key={index} className="list-group-item d-flex align-items-center">
@@ -75,9 +80,26 @@ const OrderDetails = () => {
                   border: "1px solid #ddd",
                 }}
               />
-              <div>
-                <p className="m-0"><strong>{product.name}</strong></p>
-                <p className="m-0">Qty: {product.quantity} | Price: Rs.{product.price}</p>
+              <div style={{ flex: 1 }}>
+                <p className="m-0">
+                  <strong>{product.name}</strong>
+                  {isFreeRing && (
+                    <span className="badge bg-success ms-2">FREE</span>
+                  )}
+                </p>
+                <p className="m-0">
+                  Qty: {product.quantity} | 
+                  {isFreeRing ? (
+                    <>
+                      <span style={{ textDecoration: "line-through", color: "#999", marginLeft: "8px" }}>
+                        Rs.{product.price || "0"}
+                      </span>
+                      <span className="text-success ms-2">FREE</span>
+                    </>
+                  ) : (
+                    <span style={{ marginLeft: "8px" }}>Price: Rs.{product.price}</span>
+                  )}
+                </p>
               </div>
             </li>
           );
