@@ -1,0 +1,274 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { blogHighlights } from "../data/blogHighlights";
+
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="hm-footer">
+      <div className="container py-5">
+        <div className="footer-grid">
+          {/* Brand */}
+          <div>
+            <h4 className="footer-logo">ZAIRI</h4>
+            <p className="footer-text">
+              Contemporary jewellery and accessories curated for every story.
+            </p>
+            <div className="footer-blog-section">
+              <p className="footer-heading mb-2">From the Journal</p>
+              <div className="footer-blog-list">
+                {blogHighlights.map((post) => (
+                  <Link key={post.id} href={post.slug} className="footer-blog-item">
+                    <span className="footer-blog-date">{post.date}</span>
+                    <h5>{post.title}</h5>
+                    <p>{post.excerpt}</p>
+                  </Link>
+                ))}
+              </div>
+              <Link href="/blog" className="footer-blog-cta">
+                Read all articles →
+              </Link>
+            </div>
+          </div>
+
+          {/* Shop */}
+          <div>
+            <p className="footer-heading">Shop</p>
+            <ul className="footer-links">
+              <li><Link href="/product?category=jewellery">Jewellery</Link></li>
+              <li><Link href="/product?category=combo">Combos</Link></li>
+              <li><Link href="/product?category=accessories">Accessories</Link></li>
+              <li><Link href="/product">New Arrivals</Link></li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <p className="footer-heading">Company</p>
+            <ul className="footer-links">
+              <li><Link href="/about">About Zairi</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
+              <li><Link href="/privacy-policy">Privacy</Link></li>
+              <li><Link href="/return-policy">Returns</Link></li>
+            </ul>
+          </div>
+
+          {/* Assistance */}
+          <div>
+            <p className="footer-heading">Need Help?</p>
+            <ul className="footer-links">
+              <li><a href="mailto:enquiryzairi@gmail.com">enquiryzairi@gmail.com</a></li>
+              <li><a href="tel:+918447145941">+91 84471 45941</a></li>
+              <li>Support hours: 10AM - 7PM IST</li>
+              <li>Live chat available every day</li>
+            </ul>
+            <div className="footer-socials">
+              <a href="https://www.instagram.com" target="_blank" rel="noreferrer"><i className="fa fa-instagram"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span>© {currentYear} Zairi. Crafted with love in India.</span>
+          <div className="footer-bottom-links">
+            <Link href="/privacy-policy">Privacy</Link>
+            <Link href="/return-policy">Returns</Link>
+            <Link href="/contact">Support</Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Floating Button */}
+      <a
+        href="https://wa.me/918447145941"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="chat-float-button"
+      >
+        Chat
+      </a>
+
+      <style>{`
+        .hm-footer {
+          background: #f7f7f7;
+          color: #111;
+        }
+
+        .footer-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 40px;
+        }
+
+        .footer-logo {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          letter-spacing: 4px;
+          font-size: 32px;
+          margin-bottom: 16px;
+        }
+
+        .footer-text {
+          font-size: 14px;
+          color: #555;
+          margin-bottom: 20px;
+        }
+
+        .footer-heading {
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-size: 13px;
+          margin-bottom: 12px;
+        }
+
+        .footer-blog-section {
+          margin-top: 24px;
+        }
+
+        .footer-blog-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+
+        .footer-blog-item {
+          text-decoration: none;
+          color: #111;
+          border-bottom: 1px solid #e6e6e6;
+          padding-bottom: 10px;
+        }
+
+        .footer-blog-item h5 {
+          margin: 4px 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        .footer-blog-item p {
+          margin: 0;
+          font-size: 13px;
+          color: #444;
+        }
+
+        .footer-blog-date {
+          font-size: 12px;
+          letter-spacing: 1px;
+          color: #777;
+          text-transform: uppercase;
+        }
+
+        .footer-blog-cta {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #111;
+        }
+
+        .footer-links {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          font-size: 14px;
+        }
+
+        .footer-links a {
+          color: #111;
+          text-decoration: none;
+        }
+
+        .footer-links a:hover {
+          color: #000;
+        }
+
+        .footer-socials {
+          display: flex;
+          gap: 12px;
+          margin-top: 16px;
+        }
+
+        .footer-socials a {
+          width: 36px;
+          height: 36px;
+          border: 1px solid #d4d5d9;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #111;
+        }
+
+        .footer-bottom {
+          border-top: 1px solid #e5e5e5;
+          margin-top: 40px;
+          padding-top: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 12px;
+          font-size: 13px;
+          color: #111;
+        }
+
+        .footer-bottom-links {
+          display: flex;
+          gap: 16px;
+        }
+
+        .footer-bottom-links a {
+          color: #111;
+          text-decoration: none;
+        }
+
+        .footer-bottom-links a:hover {
+          color: #000;
+        }
+
+        .chat-float-button {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 1000;
+          background: #000;
+          color: #fff;
+          padding: 12px 24px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .chat-float-button:hover {
+          background: #333;
+          color: #fff;
+          text-decoration: none;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        @media (max-width: 576px) {
+          .chat-float-button {
+            bottom: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            font-size: 13px;
+          }
+        }
+
+      `}</style>
+    </footer>
+  );
+};
+
+export default Footer;
