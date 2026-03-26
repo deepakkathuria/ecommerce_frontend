@@ -1,35 +1,10 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Footer, Navbar } from "../components";
 import { apiUrl } from "@/lib/apiBase";
-// Completely isolated component
-const SearchInput = React.memo(({ onSearch, initialValue = "" }) => {
-  const [localSearchTerm, setLocalSearchTerm] = useState(initialValue);
-  const inputRef = useRef(null);
-  
-  // Local state management - no parent dependencies
-  const handleInputChange = useCallback((e) => {
-    const value = e.target.value;
-    setLocalSearchTerm(value);
-    onSearch(value);
-  }, [onSearch]);
-
-  return (
-    <div className="form-group">
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Search..."
-        value={localSearchTerm}
-        onChange={handleInputChange}
-        ref={inputRef}
-      />
-    </div>
-  );
-});
 
 const Register = () => {
   const [name, setName] = useState("");

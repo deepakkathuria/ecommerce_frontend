@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +20,7 @@ const Wishlist = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const fetchWishlist = async () => {
+  const fetchWishlist = useCallback(async () => {
     const token = localStorage.getItem("apitoken");
     if (!token) {
       setWishlist([]);
@@ -57,7 +57,7 @@ const Wishlist = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     fetchWishlist();
@@ -79,7 +79,7 @@ const Wishlist = () => {
     };
     
     syncCartFromBackend();
-  }, [dispatch]);
+  }, [dispatch, fetchWishlist]);
 
   // ✅ Update outOfStockMap when cart or wishlist changes
   useEffect(() => {
